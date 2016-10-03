@@ -1,5 +1,0 @@
-CHP18.FRM
-C:\WINDOWS\SYSTEM\GRID.VBX
-ProjWinSize=89,370,248,215
-ProjWinShow=2
-IconForm="formMain"

@@ -1,5 +1,0 @@
-COMMON.FRM
-C:\WIN31\SYSTEM\CMDIALOG.VBX
-ProjWinSize=152,402,248,215
-ProjWinShow=2
-IconForm="frmcommdlg"

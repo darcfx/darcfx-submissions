@@ -1,3 +1,0 @@
-CTRLTIME.FRM
-ProjWinSize=152,403,248,215
-ProjWinShow=2

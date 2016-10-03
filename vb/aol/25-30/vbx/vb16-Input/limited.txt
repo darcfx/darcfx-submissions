@@ -1,1 +1,0 @@
-Without regestration, you are limited to 3 controls during design time.

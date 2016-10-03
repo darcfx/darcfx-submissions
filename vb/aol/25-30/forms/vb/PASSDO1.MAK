@@ -1,3 +1,0 @@
-PASSDO1.BAS
-ProjWinSize=122,145,248,215
-ProjWinShow=2

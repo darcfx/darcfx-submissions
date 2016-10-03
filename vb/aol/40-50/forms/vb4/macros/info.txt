@@ -1,2 +1,0 @@
-made by kaos in vb4 32 bit
-needs cmdialog.ocx

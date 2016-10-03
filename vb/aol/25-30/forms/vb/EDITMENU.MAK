@@ -1,3 +1,0 @@
-EDITMENU.FRM
-ProjWinSize=235,570,197,215
-ProjWinShow=2
