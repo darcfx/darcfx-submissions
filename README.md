@@ -1,6 +1,6 @@
 # darcfx-submissions
 
-# History of DarcFX
+// History of DarcFX
 DarcFX.com was created in August of 2000.  I embarked upon setting up a personal website to post my programs, helpful code snipets, and tutorials on how to make programs such as the ones I made, which at the time were mostly AOL mods.  Things went slow.  To say the least, DarcFX.com was competing with one of the largest tutorial and example sites on the web, instantly recognized by most as KnK 4 Life. 
 
 At this stage in my life, I was a regular user of TheZone IRC Network (irc.tzirc.com - #TheZone).  I hadn't really been close with Bill (KnK), but I did know him since he did pop into #TheZone from time to time.  Bill eventually got busy with life, and decided to close KnK 4 Life, for life.  But instead of rendering his site useless, he decided to sell CDs with all the files on it, hoping that someone would take-over.  I bought KnK CD no. 2.  Bill had allowed me to post all the KnK files with or without credit to himself.  Of course, because I am not lame, he's been right here up-front in the story ever since.
