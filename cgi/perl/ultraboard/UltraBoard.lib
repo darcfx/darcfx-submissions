@@ -1,0 +1,246 @@
+###############################################################################
+# UltraBoard.lib                                                              #
+###############################################################################
+# UltraBoard Ver. 1.62 by UltraScripts.com                                    #
+# Scripts written by Jacky W.W. Yung, WebMaster@UltraScripts.com              #
+# Available from http://www.UltraScripts.com/UltraBoard/                      #
+# --------------------------------------------------------------------------- #
+# PROGRAM NAME : UltraBoard                                                   #
+# VERSION : 1.62                                                              #
+# LAST MODIFIED : 29/07/1999                                                  #
+# =========================================================================== #
+# COPYRIGHT NOTICE :                                                          #
+#                                                                             #
+# Copyright (c) 1999 Jacky Yung. All Rights Reserved.                         #
+#                                                                             #
+# This program is free software; you can change or modify it as you see fit.  #
+# However, modified versions cannot be sold or distributed.  You cannot alter #
+# the copyright and "powered by" notices throughout the scripts. These        #
+# notices must be clearly visible to the end users.                           #
+#                                                                             #
+# WARRANTY DISCLAIMER:                                                        #
+#                                                                             #
+# THIS PROGRAM IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT WITHOUT #
+# ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR       #
+# FITNESS FOR A PARTICULAR PURPOSE.                                           #
+###############################################################################
+
+###############################################################################
+# CheckPermission                                                             #
+###############################################################################
+sub CheckPermission {
+	&GetCookies();
+    $Group = "Guest";
+    if ($in{'Session'} ne "") {
+        $SaveSession=0;
+        $SessionID=$in{'Session'};
+        ($UserName, $Password)=&GetSession($in{'Session'});
+    }
+    if (($UserName == -1)||(!$UserName)) {
+        $SaveSession=1;
+        if ($in{'UserName'} && $in{'Password'}) {
+            $UserName=lc($in{'UserName'});
+            $Password=$in{'Password'};
+        }elsif (($Cookies{'UserName'}&&$Cookies{'Password'})) {
+            $UserName=lc($Cookies{'UserName'});
+            $Password=$Cookies{'Password'};
+        }        
+    }
+    #print $Cookies{'UserName'},$Cookies{'Password'};
+	#$Group = "Guest";
+	#if ($in{'UserName'} && $in{'Password'}) {
+	#	$UserName=lc($in{'UserName'});
+	#	$Password=$in{'Password'};
+	#}elsif (($Cookies{'UserName'}&&$Cookies{'Password'})) {
+	#	$UserName=lc($Cookies{'UserName'});
+	#	$Password=$Cookies{'Password'};
+	#}
+	if (($Cookies{'UserName'}&&$Cookies{'Password'})) {
+		$Remember="on";
+	}
+	if (-e "$MembersPath/$UserName.info") {
+		@MemberData=&GetMemberData($UserName);
+		if ($MemberData[6] ne "Activate") {
+			print &CookiesHeader(time+31536000,"UserName","","Password","");
+			&ShowError("ACCESS DENIED","$MemberData[6] Your $UserName account has been disactivated.<br>Please contact the webmaster (".&Link("mailto:$EmailAddress","","").$EmailAddress."</a>".") for more information.");
+		}
+		$EPassword=Crypt::crypt($Password,substr($UserName, 0, 2));
+		if ($EPassword eq $MemberData[2]) {
+			$Group=$MemberData[3];
+
+            if ($SaveSession == 1) {
+                $SessionID=&CreateSession($UserName, $Password);
+            }
+
+			if ($in{'Remember'}) {
+				print &CookiesHeader(time+31536000,"UserName",$UserName,"Password",$Password);
+			}
+		}else{
+            @MemberData=[];
+			$UserName="";
+			$Password="";
+			$EPassword="";
+            $SessionID="";
+        }
+	}else{
+		$UserName="";
+		$Password="";
+		$EPassword="";
+        $SessionID="";
+	}
+    &RemoveSessions;
+}
+
+###############################################################################
+# GetHTMLHeader                                                               #
+###############################################################################
+sub GetHTMLHeader {
+	my ($Title, $HTML);
+	if ($TitleMode eq "GRAPHIC") {
+		$Title =	&Image("$URLImages/$TitleGraphic","","","","","","$UBName - $UBDes");
+	}else{
+		$Title =	&Font($FontFace,$TitleNameSize,$TitleTextColor)."<b>".$UBName."</b>"."</font>"."<br>".
+					&Font($FontFace,$TitleDesSize,$TitleTextColor).$UBDes."</font>";
+	}
+	$HTML.=	&BTable($TableWidth,$TableAlign,"0","0",$TableCellSpacing,$TableCellPadding,$TableBorderColor,"","").
+				&Tr($TitleAlign,"",$TitleBGColor).
+					&Td("","","","","","","","","").
+						$Title.
+					"</td>".
+				"</tr>".
+				&GetMenu().
+			&CBTable();
+	return $HTML;
+}
+
+###############################################################################
+# GetMenu                                                                     #
+###############################################################################
+sub GetMenu {
+	my ($HTML);
+	$HTML.= &Table("100%","","0","0","","").
+				&Tr("","","").
+					&Td("","","","","","","","","");       
+	$HTML.=	&Link("UltraBoard.$Ext?Idle=$in{'Idle'}&Sort=$in{'Sort'}&Order=$in{'Order'}&Session=$SessionID","","",
+			"Back to $UBName").$imgHome."</a>".$imgSperater if ($in{'Action'} ne "");
+    if (($Group eq "Guest")&&($in{'Action'} ne "SignIn")) {
+        $HTML.=	&Link("UltraBoard.$Ext?Action=SignIn&Ref=$in{'Action'}&Category=$in{'Category'}&Board=$in{'Board'}&Post=$in{'Post'}&ID=$in{'ID'}&Idle=$in{'Idle'}&Sort=$in{'Sort'}&Order=$in{'Order'}&Page=$in{'Page'}&Session=$SessionID","","",
+				"Sign In").$imgSignIn."</a>".$imgSperater;   
+    }elsif ($in{'Action'} ne "SignIn") {
+        $HTML.=	&Link("UltraBoard.$Ext?Action=SignOut&Ref=$in{'Action'}&Category=$in{'Category'}&Board=$in{'Board'}&Post=$in{'Post'}&ID=$in{'ID'}&Idle=$in{'Idle'}&Sort=$in{'Sort'}&Order=$in{'Order'}&Page=$in{'Page'}","","",
+				"Sign Out").$imgSignOut."</a>".$imgSperater;    
+    }
+    if (($Group ne "Guest")&&($in{'Action'} ne "SignUp")) {
+        $HTML.=	&Link("UltraBoard.$Ext?Action=ModifyAccount&Ref=$in{'Action'}&Category=$in{'Category'}&Board=$in{'Board'}&Post=$in{'Post'}&ID=$in{'ID'}&Idle=$in{'Idle'}&Sort=$in{'Sort'}&Order=$in{'Order'}&Page=$in{'Page'}&Session=$SessionID","","",
+				"Modify Your Account").$imgModifyAccount."</a>".$imgSperater;    
+    }elsif (($in{'Action'} ne "SignUp")&&($AllowRegister)) {
+        $HTML.=	&Link("UltraBoard.$Ext?Action=SignUp&Ref=$in{'Action'}&Category=$in{'Category'}&Board=$in{'Board'}&Post=$in{'Post'}&ID=$in{'ID'}&Idle=$in{'Idle'}&Sort=$in{'Sort'}&Order=$in{'Order'}&Page=$in{'Page'}&Session=$SessionID","","",
+				"Sign Up for a New Account").$imgSignUp."</a>".$imgSperater;    
+    }
+	if ($in{'Action'} ne "SearchThreads") {
+        $HTML.=	&Link("UltraBoard.$Ext?Action=SearchThreads&Idle=$in{'Idle'}&Sort=$in{'Sort'}&Order=$in{'Order'}&Page=$in{'Page'}&Session=$SessionID","","",
+				"Search Threads").$imgSearch."</a>".$imgSperater if ($in{'Action'} ne "Search");
+	}    
+	$HTML.=	&Link("UltraBoard.$Ext?Action=Help&Idle=$in{'Idle'}&Sort=$in{'Sort'}&Order=$in{'Order'}&Page=$in{'Page'}&Session=$SessionID","","",
+			"Help").$imgHelp."</a>".$imgSperater if ($in{'Action'} ne "Help");
+	if ($Group eq "administrator") {
+		$HTML.=	&Link("UBAdmin.$Ext?Session=$SessionID","","",
+				"Administrative Center").$imgAdmin."</a>".$imgSperater;
+	}
+    $HTML.=				&Link("$URLSite","_TOP","",
+						"Back to $SiteName").$imgSite."</a>";   
+	$HTML.=					"</td>".&Td("","","","","RIGHT","","","","");
+    if ((($in{'Action'} eq "ShowBoard")||($in{'Action'} eq "ShowPost"))&&($in{'Board'})) {
+        if ((!defined ($MemberStatus))||($MemberStatus ne "ReadOnly")) {
+            $HTML.=	&Link("UltraBoard.$Ext?Action=NewPost&Post=$in{'Post'}&Board=$in{'Board'}&Idle=$in{'Idle'}&Sort=$in{'Sort'}&Order=$in{'Order'}&Page=$in{'Page'}&Session=$SessionID","","",
+					"Post new Topic").$imgPost."</a>";
+            
+	        $HTML.=	$imgSperater.&Link("UltraBoard.$Ext?Action=NewReply&Post=$in{'Post'}&Board=$in{'Board'}&Idle=$in{'Idle'}&Sort=$in{'Sort'}&Order=$in{'Order'}&Page=$in{'Page'}&Session=$SessionID","","",
+					"Reply this Topic").$imgReply."</a>".$imgSperater if (($in{'Post'})&&(!$Closed));
+        }
+	}
+    $HTML.= $imgSperater if ($Closed);
+	if (($in{'Action'} eq "ShowPost")&&($in{'Board'})&&($in{'Post'})) {
+        $HTML.=	&Link("UltraBoard.$Ext?Action=PrintableTopic&Post=$in{'Post'}&Board=$in{'Board'}&Idle=$in{'Idle'}&Sort=$in{'Sort'}&Order=$in{'Order'}&Page=$in{'Page'}&Session=$SessionID","","",
+				"View Printable Version of this Topic").$imgPrint."</a>";
+	    $HTML.=	$imgSperater.&Link("UltraBoard.$Ext?Action=ForwardTopic&Post=$in{'Post'}&Board=$in{'Board'}&Idle=$in{'Idle'}&Sort=$in{'Sort'}&Order=$in{'Order'}&Page=$in{'Page'}&Session=$SessionID","","",
+				"Forward this Topic to Friend").$imgForward."</a>" if ($EmailFunction);
+    }
+	$HTML.=			"</td>".
+				"</tr>".
+			"</table>";
+	return $HTML;
+}
+
+###############################################################################
+# GetBoardList                                                                #
+###############################################################################
+sub GetBoardList {
+	my ($HTML,@BoardList);
+    
+	open(CATEGORIES,"$DBPath/Categories.db")||&CGIError("Couldn't open/read the Categories.db file<br>\nPath: $DBPath<br>\nReason : $!");
+        flock(CATEGORIES,1) if ($FLock);
+        my @CATEGORIES_DATA=<CATEGORIES>;
+    close(CATEGORIES);
+    for (@CATEGORIES_DATA) {
+		@CATEGORIES_INFO=&DecodeDBOutput($_);
+		if ($UseCategory) {
+			push (@BoardList,$CATEGORIES_INFO[1],"C_".$CATEGORIES_INFO[0]);	
+		}
+        open(CATEGORY,"$DBPath/$CATEGORIES_INFO[0].cat")||&CGIError("Couldn't open/read the $CATEGORIES_INFO[0].cat file<br>\nPath: $DBPath<br>\nReason : $!");
+            flock(CATEGORY,1) if ($FLock);
+            @CATEGORY_DATA=<CATEGORY>;
+        close(CATEGORY);
+        for (my ($i)=1;$i<=$#CATEGORY_DATA;$i++) {
+            @CATEGORY_INFO=&DecodeDBOutput($CATEGORY_DATA[$i]);
+            if ($CATEGORY_INFO[5] eq "Active") {
+                if (($CATEGORY_INFO[6] eq "Private")&&($Group ne "administrator")) {
+                    if ($Group eq "Guest") {
+                        next;
+                    }
+                    require "$DBPath/$CATEGORY_INFO[0]/Access.db";
+                    if (!$Access{$MemberData[3]}) {
+                        next;
+                    }
+                }
+                push (@BoardList,"- ".$CATEGORY_INFO[1],"B_".$CATEGORY_INFO[0]);
+                $Access={};		# Clean Member List in Private Board
+            }
+        }
+    }
+###############################################################################
+    my $Link;
+    if ($in{'Category'}) {
+        $Link="C_".$in{'Category'};
+    }else{
+        $Link="B_".$in{'Board'};
+    }
+    $HTML.= &Table($TableWidth,$TableAlign,"","6","","").
+                &Tr("","","").
+					&Td("","","","","","","nowrap","","").
+						&Form("UltraBoard.$Ext","POST","","").
+                        &HiddenBox("Action","Redirect").
+                        &HiddenBox("Session",$SessionID).
+                        #&HiddenBox("UserName",$UserName).
+                        #&HiddenBox("Password",$Password).
+                        &HiddenBox("Idle",$in{'Idle'}).
+                        &HiddenBox("Order",$in{'Order'}).
+                        &HiddenBox("Sort",$in{'Sort'}).
+			       "</td>".
+				"</tr>".
+				&Tr("","","").
+					&Td("","","","","RIGHT","","","","").
+						&Select("Link","","","",$Link,@BoardList).&Submit("","GO","","").
+	         		"</td>".
+				"</tr>".
+                &Tr("","","").
+					&Td("","","","","","","nowrap","","").
+						"</form>".
+					"</td>".
+				"</tr>".
+			"</table>";
+    return $HTML;
+}
+###############################################################################
+1;# End of UltraBoard.lib file
+###############################################################################

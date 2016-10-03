@@ -1,0 +1,1 @@
+happy|^|Happy Face|^|http://$URLImages/Happy.gif|^|on

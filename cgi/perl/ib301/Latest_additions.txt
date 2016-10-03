@@ -1,0 +1,53 @@
+----------------------
+Software: Ikonboard
+Version: v3.0 GOLD
+Release Date: TBD
+----------------------
+
+
+Bug Fixes:
+----------
+
+No year entered makes age current year bug fix (By: Matt)
+Anon log in showing in Active users list (By: Matt)
+Anon log in not working with repetitive auto log ins (By: Matt)
+Calendar time not taking into account board offset (By: Matt)
+AdminCP -> Previewing reg's listing bug fix (By: Matt)
+AdminCP -> Pre-registration not adding to board stats bug fix (By: Matt)
+Emoticons not converted in post preview bug fix
+Emoticons making a mess in the post box bug fix
+Embedded quoting fixed.
+Forum Jump javascript fix
+HTML tags not parsing globally bug fixed
+SQL tags not parsing globally bug fixed
+ICQ button appearing when no ICQ number is entered
+Skin attributes not applied to messenger images bug fix
+Post counts not updating with ModCP bug fix
+Hardcoded images in the messenger removed
+Bug that allowed partial birthdate entries fixed
+Help search results displaying wrong bgcolour fixed
+Help search resolution turned down (finds more matches)
+Blank error msg when guests attempt to email bug fix
+Invite friend confirmation error bug fix (wrong name used)
+"[" and "]"when searching for a member in the AdminCP bug fix
+Profile location field capped to 128 characters via AdminCP
+"[ me ]" tag fixes when quoted
+"[ me ]" tag shows correct name when used with the messenger
+mySQL schematic updated to allow for longer email addresses
+pgSQL bug fixes
+Member "pips" not appearing in the Messenger bug fix
+Hardcoded ".cgi" removed from Boards.pm
+Ban checks added prior to registration
+Last topic title in board view bug fix
+Messenger -> Sending msg to members that cannot use the messenger bug fix (By: Infection)
+Board listing -> Last poster in a sub cat profile not linked bug fix
+Being able to reply to locked topics bug fix
+
+
+Additions:
+----------
+
+
+
+Changes:
+--------

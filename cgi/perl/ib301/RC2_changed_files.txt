@@ -1,0 +1,126 @@
+----------------------
+Software: Ikonboard
+Version: v3 RC 2
+Release Date: 21/11/01 2:20am GMT
+----------------------
+
+ikonboard.cgi
+
+############################
+# DATA
+############################
+/Data/SkinList.cfg
+
+############################
+# DATABASE
+############################
+
+/calendar/                   # New directory (CHMOD: 0777)
+/config/forum_rules.cfg
+/config/message_data.cfg
+/config/categories.cfg
+/config/active_sessions.cfg
+
+############################
+# SOURCES / ADMIN
+############################
+
+/Sources/Admin/Authorise.pm        (added code in "_delete_them")
+/Sources/Admin/Backup.pm
+/Sources/Admin/Import.pm
+/Sources/Admin/Index.pm
+/Sources/Admin/Category.pm
+/Sources/Admin/ForumControl.pm
+/Sources/Admin/Functions.pm
+/Sources/Admin/MemberGroup.pm
+/Sources/Admin/ModControl.pm
+/Sources/Admin/MemberControl.pm
+/Sources/Admin/Options.pm
+/Sources/Admin/SKIN.pm
+/Sources/Admin/SkinControl.pm
+/Sources/Admin/Tools.pm            # New file
+
+
+
+############################
+# SOURCES
+############################
+
+/Sources/Archive/Tar.pm
+/Sources/Boards.pm
+/Sources/Calendar.pm               (new Sources file)
+/Sources/Forum.pm
+/Sources/iDatabase/Driver/mySQL.pm
+/Sources/iDatabase/Driver/pgSQL.pm
+/Sources/iDatabase/Driver/DBM.pm
+/Sources/iDatabase/Driver/Base.pm
+/Sources/iDatabase/SQL.pm
+/Sources/iPoll.pm
+/Sources/iTextparser.pm
+/Sources/Lib/FUNC.pm
+/Sources/Legends.pm
+/Sources/Misc/Cookies.pm
+/Sources/Misc/Report.pm            (New sources file)
+/Sources/ModCP.pm
+/Sources/Post.pm
+/Sources/Profile.pm
+/Sources/Register.pm               (added code in "CreateAccount")
+/Sources/Search/                   # New directory
+/Sources/Search/api.pm
+/Sources/Search/API/api_mySQL.pm
+/Sources/Search/API/api_pgSQL.pm
+/Sources/Search/API/api_DBM.pm
+/Sources/Search/API/api_global.pm
+/Sources/Searchlog.pm
+/Sources/Sessions.pm
+/Sources/Topic.pm
+/Sources/UserCP/Lostpass.pm
+/Sources/UserCP/Menu.pm
+/Sources/UserCP/Messenger.pm
+
+############################
+# SKINS
+############################
+
+/Default/BoardsView.pm       #(And the .cfg file: Added sub show_rules_full)
+/Default/CalendarView.pm     #(New SKIN file)
+/Default/ForumView.pm        #(And the .cfg file: Added sub show_rules_full)
+/Default/LostpassView.pm     #(And the .cfg file)
+/Default/MessengerView.pm    #(And the .cfg file: Added sent_table_header and sent_row)
+/Default/ModCPView.pm        #(And the .cfg file)
+/Default/PostView.pm         #(And the .cfg file)
+/Default/ProfileView.pm      #(added $Profile->{'BIRTHDAY'} in ShowProfile)
+/Default/MenuView.pm         #(added $iB::MEMBER->{'BIRTH'} in personal_panel)
+/Default/Register.pm         #(and the config file)
+/Default/ReportView.pm       #(and the config file)
+/Default/SearchView.pm       #(And the .cfg file)
+/Default/Universal.pm        #(And the .cfg file)
+
+
+
+############################
+# LANGUAGES
+############################
+
+/en/BoardWords.pm                  (added new words)
+/en/CalendarWords.pm               (new language file)
+/en/ErrorWords.pm
+/en/LegendWords.pm
+/en/LostpassWords.pm
+/en/MessengerWords.pm
+/en/ModCPWords.pm
+/en/OnlineWords.pm
+/en/PostWords.pm
+/en/ProfileWords.pm                (added new words)
+/en/RegisterWords.pm
+/en/ReportWords.pm                 (new language file)
+/en/TopicWords.pm
+/en/UniversalWords.pm
+/en/UserCPWords.pm                 (added new words)
+
+############################
+# iB_HTML
+############################
+
+/non-cgi/Skin/Default/ikonboard.css                      (added "#date  { font-size:10px; color : #AAAACC }")
+/non-cgi/sys-img/css.html

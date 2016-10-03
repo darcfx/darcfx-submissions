@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>UltraBoard 1.62 Installation</title>
+</head>
+
+<body>
+<font face="Verdana" size="5" color="Black"><b>UltraBoard 1.62 Installation</b></font><p>
+<ol type="a">
+	<font face="Verdana" size="4" color="Black"><b><li>File Editing</b></font>
+		<p><font face="Verdana" size="2" color="Black">
+		<ol>
+			<li>Open the <b>UltraBoard.pl</b>, <b>UBAdmin.pl</b>, <b>Setup.pl</b>, and <b>Upgrade.pl</b>.<p>
+				<font color="Red"><b>Note:</b> open <b>Upgrade.pl</b> only if you are upgrading the <b>UltraBoard 1.50b</b> to <b>UltraBoard 1.62b</b>.</font><p>
+			<li>Look at the first line.
+				<blockquote>
+					It says:
+					<blockquote>
+						<font color="Green" face="courier new">#!/usr/bin/perl</font>
+					</blockquote>
+					and change it to correct location of Perl 5 on your web server.
+				</blockquote>
+				<font face="" color="Red"><b>Note:</b> If that's where Perl is on your system, leave everything alone and skip this part. If that is <b>NOT</b> where Perl 5 is and you don't know the location of Perl 5 on your web server, then ask your system administrator or find it on your hosting web site.</font><p>
+				<font face="" color="Red"><b>Note:</b> if you are installing on Windows web server, leave everything alone and skip this part.</font><p>
+		</ol>
+		</font></p>
+		
+	<font face="Verdana" size="4" color="Black"><b><li>Uploading & Set File Permission</b></font>
+		<p><font face="Verdana" size="2" color="Black">
+		<ol>
+			<li>Log in to your web server by FTP or Telnet.<p>
+			
+			<li>Create a <b>UltraBoard</b> directory in <b>/cgi-bin</b>.<p>
+			
+			<li>Upload the <b>UltraBoard.pl</b>, <b>UBAdmin.pl</b>, <b>Setup.pl</b>, and <b>Upgrade.pl</b> to <b>UltraBoard</b> directory, and set the permission to <b>755</b>.</b>.<p>		
+				<font color="Red"><b>Note:</b> upload <b>Upgrade.pl</b> only if you are upgrading the <b>UltraBoard 1.50b</b> to <b>UltraBoard 1.62b</b>.</font><p>
+			<li>Create a <b>Sources</b> directory and Create The Directories already inside the Sources Directory located in the Zip File. Upload all the files under their correct directories. Set the permission of <b>Sources</b> directory and all the files and directories to <b>755</b>.<p>
+				<font face="" color="Red"><b>Note:</b> upload all the files in <b>ascii mode</b>.</font><p>
+				
+			<li>Create a <b>UBData</b> directory and Create the directories inside of UBData. Upload all the files under their Correct directories. Set the permission of <b>UBData</b> directory and all the files to <b>777</b>.<p>
+				<font face="" color="Red"><b>Note:</b> upload all the files in <b>ascii mode</b>.</font><p>
+				
+			<li>Create a <b>Variables</b> directory and upload all the files under this directory to <b>UltraBoard</b> directory. Set the permission of <b>Variables</b> directory and all the files to <b>777</b>.<p>
+				<font face="" color="Red"><b>Note:</b> upload all the files in <b>ascii mode</b>.</font><p>
+				
+			<li>Create a <b>Images</b> directory and upload all the files under this directory to <b>UltraBoard</b> directory.<p>
+				<font face="" color="Red"><b>Note:</b> upload all the files in <b>binary mode</b>.</font><p>	
+				
+		</ol>
+		</font></p>
+	<font face="Verdana" size="4" color="Black"><b><li>Finishing Up</b></font>
+		<p><font face="Verdana" size="2" color="Black">
+		<ol>
+			<li>Run <b>Upgrade.pl</b>, it will help you upgrade the <b>UltraBoard 1.50b</b> to <b>UltraBoard 1.62b</b></b>.<p>
+				<font face="" color="Red"><b>Note:</b> if you are upgrading the <b>UltraBoard 1.50b</b> to <b>UltraBoard 1.62b</b>.</font><p>
+				<font face="" color="Red"><b>Note:</b> it will take a lot of time to convert the data from 1.50b to 1.62b, so <b>DON'T STOP</b> it <b>until</b> it finish all the process!!</font><p>
+				<font face="" color="Red"><b>Note:</b> Be sure <b>DON'T USE THE SAME DIRECTORY</b> with 1.50b.</font><p>
+			<li>Run <b>Setup.pl</b>, it will help you setup the <b>UltraBoard 1.62</b></b>.<p>
+			<li>Play around with your new forum now !</b>.<p>
+			<font face="" color="Red"><b>Note:</b> After going through the <b>Setup.pl </b>and setting up your Admin Account Delete <b>Setup.pl</b> from you server so none can change your settings or create an Admin Account.</font><p>
+			<font face="" color="Red"><b>Note:</b> If you want to change the <b>header</b> and <b>footer</b> of <b>UltraBoard 1.62</b>, edit the <b>UltraBoard.them</b> file in <b>Variables</b> directory.</font><p>
+		</ol>
+		</font></p>
+</ol>
+<font face="Verdana" size="5" color="Black"><b>Copyright Notice</b></font><p>
+<font face="Verdana" size="2">
+This program is free software; you can change or modify it as you see fit. However, modified versions cannot be sold or distributed. You cannot alter the copyright and "powered by" notices throughout the scripts. These notices must be clearly visible to the end users.
+</font>
+<p>
+<font face="Verdana" size="5" color="Black"><b>Usage Disclaimer</b></font><p>
+<font face="Verdana" size="2">
+THIS PROGRAM IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.       
+</font>
+</body>
+</html>

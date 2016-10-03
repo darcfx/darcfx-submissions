@@ -1,0 +1,141 @@
+###############################################################################
+# SearchAccounts.lib                                                          #
+###############################################################################
+# UltraBoard Ver. 1.62 by UltraScripts.com                                    #
+# Scripts written by Jacky W.W. Yung, WebMaster@UltraScripts.com              #
+# Available from http://www.UltraScripts.com/UltraBoard/                      #
+# --------------------------------------------------------------------------- #
+# PROGRAM NAME : UltraBoard                                                   #
+# VERSION : 1.62                                                              #
+# LAST MODIFIED : 29/07/1999                                                  #
+# =========================================================================== #
+# COPYRIGHT NOTICE :                                                          #
+#                                                                             #
+# Copyright (c) 1999 Jacky Yung. All Rights Reserved.                         #
+#                                                                             #
+# This program is free software; you can change or modify it as you see fit.  #
+# However, modified versions cannot be sold or distributed.  You cannot alter #
+# the copyright and "powered by" notices throughout the scripts. These        #
+# notices must be clearly visible to the end users.                           #
+#                                                                             #
+# WARRANTY DISCLAIMER:                                                        #
+#                                                                             #
+# THIS PROGRAM IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT WITHOUT #
+# ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR       #
+# FITNESS FOR A PARTICULAR PURPOSE.                                           #
+###############################################################################
+
+###############################################################################
+# SearchAccounts                                                              #
+###############################################################################
+sub SearchAccounts {
+	$NowTime=time;
+	$LastPostDaysToSeconds=86400*$in{'LastPostDays'};
+	$Count=0;
+	@KeyWords = split(/ /, $in{'Keywords'});
+	for ($i=0;$i<$in{'Count'};$i++) {
+		if ($in{"GroupID_".$i}) {
+			open(MEMBERS,"$MembersPath/".$in{"GroupID_".$i}.".grp")||&CGIError("Couldn't open/read the ".$in{"GroupID_".$i}.".grp file<br>\nPath: $MembersPath<br>\nReason : $!");
+				flock(MEMBERS,1) if ($FLock);
+				@MEMBERS_DATA=<MEMBERS>;
+			close(MEMBERS);
+			@GroupInfo=&DecodeDBOutput($MEMBERS_DATA[0]);
+			for ($j=1;$j<=$#MEMBERS_DATA;$j++) {
+				chomp($MEMBERS_DATA[$j]);
+				@MemberInfo=&GetMemberData($MEMBERS_DATA[$j]);
+                if ((($in{'TotalPostType'} eq "more")&&($MemberInfo[5]>$in{'TotalPostMessages'}))||($in{'TotalPostMessages'} eq "")) {
+                    if	(	($MemberInfo[7] ne "N/A")&&($in{'LastPostDays'} ne "")&&
+                            (($MemberInfo[7]+$LastPostDaysToSeconds<$NowTime)&&($in{'LastPostType'} eq "more"))||
+                            ($MemberInfo[7]+$LastPostDaysToSeconds>$NowTime)&&($in{'LastPostType'} eq "less")) {
+                        &CheckWords;
+                    }elsif ($in{'LastPostDays'} eq "N/A") {
+                        &CheckWords;
+                    }elsif ($in{'LastPostDays'} eq "") {
+                        &CheckWords;
+                    }
+                }elsif (($in{'TotalPostType'} eq "less")&&($MemberInfo[5]<$in{'TotalPostMessages'})) {
+                    if	(	($MemberInfo[7] ne "N/A")&&($in{'LastPostDays'} ne "")&&
+						(($MemberInfo[7]+$LastPostDaysToSeconds<$NowTime)&&($in{'LastPostType'} eq "more"))||
+						($MemberInfo[7]+$LastPostDaysToSeconds>$NowTime)&&($in{'LastPostType'} eq "less")) {
+                        &CheckWords;
+                    }elsif ($in{'LastPostDays'} eq "N/A") {
+                        &CheckWords;
+                    }elsif ($in{'LastPostDays'} eq "") {
+                        &CheckWords;
+                    }
+                }
+			}
+		}
+	}
+	if ($in{'SortOrder'} eq "Ascend") {
+		if (($in{'SortField'} eq "totalposts")||($in{'SortField'} eq "lastpost")) {
+			@SortedList=sort{$SortField{$a} <=> $SortField{$b}} keys %SortField;
+		}else{
+			@SortedList=sort{$SortField{$a} cmp $SortField{$b}} keys %SortField;
+		}
+    }else{
+		if (($in{'SortField'} eq "totalposts")||($in{'SortField'} eq "lastpost")) {
+			@SortedList=sort{$SortField{$b} <=> $SortField{$a}} keys %SortField;
+		}else{
+			@SortedList=sort{$SortField{$b} cmp $SortField{$a}} keys %SortField;
+		}
+    }
+}
+
+###############################################################################
+# CheckWords                                                                  #
+###############################################################################
+sub CheckWords {
+	$Found=0;
+	foreach $KeyWord (@KeyWords) {
+		$Found=0;
+		if ((($in{'Method'}=~/NickName/)||($in{'Method'} eq "All"))&&($MemberInfo[1]=~/$KeyWord/i)) {
+			$Found++;
+		}elsif ((($in{'Method'}=~/UserName/)||($in{'Method'} eq "All"))&&($MemberInfo[0]=~/$KeyWord/i)) {
+			$Found++;
+		}elsif ((($in{'Method'}=~/Location/)||($in{'Method'} eq "All"))&&($MemberInfo[9]=~/$KeyWord/i)) {
+			$Found++;
+		}elsif ((($in{'Method'}=~/Occupation/)||($in{'Method'} eq "All"))&&($MemberInfo[11]=~/$KeyWord/i)) {
+			$Found++;
+		}elsif ((($in{'Method'}=~/Interests/)||($in{'Method'} eq "All"))&&($MemberInfo[12]=~/$KeyWord/i)) {
+			$Found++;
+		}elsif ((($in{'Method'}=~/Comments/)||($in{'Method'} eq "All"))&&($MemberInfo[14]=~/$KeyWord/i)) {
+			$Found++;
+		}elsif ((($in{'Method'}=~/Signature/)||($in{'Method'} eq "All"))&&($MemberInfo[15]=~/$KeyWord/i)) {
+			$Found++;
+		}
+		if (($in{'Bealoon'} eq "Or")&&($Found>0)) {
+			$Found=1;
+			last;
+		}elsif (($in{'Bealoon'} eq "And")&&($Found<=0)) {
+			$Found=0;
+			last;
+		}
+	}
+	if (($Found > 0)||(!$in{'Keywords'})) {
+		push (@MemberID,
+			&EncodeDBInput(
+				$MemberInfo[0],
+				$MemberInfo[1],
+				$MemberInfo[3],
+				$MemberInfo[4],
+				$MemberInfo[5],
+				$MemberInfo[6],
+				$MemberInfo[7],
+				$GroupInfo[1]
+			)
+		);
+		if ($in{'SortField'} eq "nickname") {
+			$SortField{$Count++}=lc($MemberInfo[1]);
+		}elsif ($in{'SortField'} eq "email") {
+			$SortField{$Count++}=lc($MemberInfo[4]);	
+		}elsif ($in{'SortField'} eq "totalposts") {
+			$SortField{$Count++}=$MemberInfo[5];	
+		}elsif ($in{'SortField'} eq "lastpost") {
+			$SortField{$Count++}=$MemberInfo[7];	
+		}
+	}
+}
+###############################################################################
+1;# End of SearchAccounts Function
+###############################################################################

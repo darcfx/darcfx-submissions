@@ -1,0 +1,433 @@
+create table ib_active_sessions (
+   id                     character varying(32)       not null default '0',
+   member_name            character varying(32),
+   member_password        character varying(32),
+   member_id              character varying(32),
+   this_ip                character varying(16),
+   last_log_in            integer,
+   user_agent             character varying(64),
+   running_time           integer,
+   member_logstate        integer,
+   location               character varying(64),
+   log_in_type            integer,
+   member_group           integer,
+   primary key            (id)
+);
+
+create table ib_address_books (
+   id                     integer                     not null default '0',
+   in_member_id           character varying(32)       not null,
+   member_id              character varying(32)       not null,
+   in_member_name         character varying(32)       not null,
+   receive_msg            integer,
+   in_member_desc         character varying(48)       default '',
+   primary key            (id)
+);
+
+create table ib_attachments (
+   id                     integer                     not null default '0',
+   mime_type              character varying(128)      not null,
+   file_name              character varying(64)       not null,
+   primary key            (id)
+);
+
+
+create table ib_authorisation (
+   id                     integer                     not null default '0',
+   unique_code            character varying(32)       not null,
+   date_entered           integer                     not null default '0',
+   member_id              character varying(32)       not null,
+   member_name            character varying(32)       not null,
+   this_ip                character varying(16)       default '',
+   member_email           character varying(128)      not null,
+   _where                 character varying(32)       default '',
+   member_group           integer,
+   primary key            (id)
+);
+
+create table ib_categories (
+   cat_id                 integer                     not null default '0',
+   cat_pos                integer,           
+   cat_state              character varying(16),
+   cat_name               character varying(128)      not null,
+   cat_desc               character varying(128)      default '',
+   sub_cat_id             character varying(16)       default '',
+   view                   character varying(16),
+   image                  character varying(256),
+   url                    character varying(256),
+   primary key            (cat_id)
+);
+
+create table ib_email_templates (
+   id                     character varying(32)       not null,
+   type                   character varying(8)        not null,
+   template               text,
+   primary key            (id)
+);
+
+create table ib_forum_info (
+   forum_id               integer                     not null default '0',
+   forum_topics           integer,
+   forum_posts            integer,
+   forum_last_post        integer,
+   forum_last_poster      character varying(32),
+   forum_last_poster_n    character varying(32),
+   forum_name             character varying(128)      not null,
+   forum_desc             text,
+   forum_position         integer,
+   forum_ibc              integer,
+   forum_html             integer,
+   forum_status           character varying(16),
+   forum_start_threads    character varying(32),
+   forum_reply_threads    character varying(32),
+   forum_view_threads     character varying(32),
+   forum_protect          character varying(32),
+   category               integer                     not null default '0',
+   l_topic_title          character varying(32),
+   l_topic_id             integer,
+   sort_key               character varying(32),
+   sort_order             character varying(32),
+   prune_days             integer,
+   show_rules             integer,
+   allow_attach           integer,
+   moderate               integer,
+   primary key            (forum_id)
+);
+
+create table ib_forum_moderators (
+   moderator_id           integer                     not null default '0',
+   forum_id               integer                     not null default '0',
+   member_name            character varying(32)       not null,
+   member_id              character varying(32)       not null default '0',
+   edit_post              integer,
+   edit_topic             integer,
+   delete_post            integer,
+   delete_topic           integer,
+   view_ip                integer,
+   open_topic             integer,
+   close_topic            integer,
+   mass_move              integer,
+   mass_prune             integer,
+   move_topic             integer,
+   pin_topic              integer,
+   unpin_topic            integer,
+   post_q                 integer,
+   topic_q                integer,
+   allow_warn             integer,
+   primary key            (moderator_id)
+);
+
+create table ib_forum_poll_voters (
+   id                     integer                     not null default '0',
+   voter_ip               character varying(16)       default '',
+   date                   integer                     not null default '0',
+   poll_id                integer                     not null default '0',
+   member_id              character varying(32)       not null,
+   forum_id               integer                     not null,
+   primary key            (id)
+);
+
+create table ib_forum_polls (
+   id                     integer                     not null default '0',
+   poll_id                integer                     not null default '0',
+   poll_title             character varying(128)      not null,
+   poll_desc              text,
+   poll_started           integer,
+   poll_answers           text,
+   poll_starter           character varying(32),
+   poll_starter_n         character varying(32),
+   total_votes            integer,
+   forum_id               integer,
+   primary key            (id)
+);
+
+create table ib_forum_rules (
+   id                     integer                     not null default '0',
+   rules_title            character varying(128)      not null,
+   rules_text             text,
+   last_update            integer,
+   show_all               integer                     default '',
+   primary key            (id)
+);
+
+create table ib_forum_subscriptions (
+   id                     integer                     not null default '0',
+   member_id              character varying(32)       not null,
+   member_name            character varying(32),
+   email_address          character varying(32),
+   forum_id               integer                     not null default '0',
+   topic_id               integer                     not null default '0',
+   date_started           integer                     not null default '0',
+   last_sent              integer,
+   prune                  integer,
+   rfull                  integer,
+   primary key            (id)
+);
+
+create table ib_forum_topics (
+   topic_id               integer                     not null default '0',
+   topic_title            character varying(72)       not null,
+   topic_desc             character varying(72),
+   topic_state            character varying(8),
+   topic_posts            integer,
+   topic_starter          character varying(32),
+   topic_start_date       integer,
+   topic_last_poster      character varying(32),
+   topic_last_date        integer,
+   topic_icon             integer,
+   topic_starter_n        character varying(32),
+   topic_lastp_n          character varying(32),
+   poll_state             character varying(8),
+   last_vote              integer,
+   topic_views            integer,
+   forum_id               integer,
+   approved               integer,
+   topic_author_type      integer,
+   pin_state              integer,
+   moved_to               character varying(8),
+   primary key            (topic_id)
+);
+
+create table ib_help (
+   id                     smallint                    not null default '0',
+   title                  character varying(128)      not null default '',
+   text                   text,
+   primary key            (id)
+);
+
+create table ib_mem_groups (
+   id                     integer                     not null default '0',
+   view_board             integer,
+   mem_info               integer,
+   other_topics           integer,
+   use_search             integer,
+   email_friend           integer,
+   invite_friend          integer,
+   edit_profile           integer,
+   post_new_topics        integer,
+   reply_own_topics       integer,
+   reply_other_topics     integer,
+   edit_own_posts         integer,
+   delete_own_posts       integer,
+   open_close_topics      integer,
+   delete_own_topics      integer,
+   post_polls             integer,
+   vote_polls             integer,
+   use_pm                 integer,
+   is_supmod              integer,
+   access_cp              integer,
+   title                  character varying(32)       not null,
+   can_remove             integer,
+   read_ad_logs           integer,
+   delete_ad_logs         integer,
+   edit_groups            integer,
+   append_edit            integer,
+   access_offline         integer,
+   avoid_q                integer,
+   avoid_flood            integer,
+   team_icon              character varying(64)       default '',
+   attach_max             integer                     default '0',
+   primary key            (id)
+);
+
+create table ib_member_profiles (
+   member_id              character varying(32)       not null default '0',
+   member_name            character varying(32)       not null,
+   member_group           integer                     not null default '0',
+   member_password        character varying(32)       not null,
+   member_email           character varying(64),
+   member_joined          integer                     not null default '0',
+   member_level           integer,
+   member_ip              character varying(16)       default '',
+   member_avatar          character varying(256),
+   avatar_dims            character varying(16),
+   member_posts           integer                     default '0',
+   photo                  character varying(72),
+   cancel_subs            integer,
+   aolname                character varying(40),
+   icqnumber              character varying(16),
+   location               character varying(512),
+   signature              text,
+   website                character varying(72),
+   yahooname              character varying(32),
+   member_title           character varying(64),
+   last_update            integer,
+   allow_admin_emails     integer,
+   time_adjust            character varying(8),
+   interests              character varying(512),
+   hide_email             character varying(8),
+   pm_reminder            character varying(8),
+   email_full_post        integer,
+   member_skin            character varying(32),
+   warn_level             integer,
+   language               character varying(32),
+   msnname                character varying(32),
+   last_post              character varying(32),
+   allow_post             integer,
+   view_sigs              integer,
+   view_img               integer,
+   view_avs               integer,
+   primary key            (member_id)
+);
+
+create table ib_message_data (
+   message_id             integer                     not null default '0',
+   date                   integer,
+   read_state             integer,
+   title                  character varying(128),
+   message                text,
+   message_icon           integer,
+   from_id                character varying(32),
+   from_name              character varying(32),
+   reply                  integer,
+   reply_date             integer,
+   virtual_dir            character varying(32),
+   member_id              character varying(32),
+   recipient_id           character varying(32)       default '',
+   recipient_name         character varying(32)       default '',
+   primary key            (message_id)
+);
+
+create table ib_message_stats (
+   member_id              character varying(32)       not null,
+   last_read              integer,
+   new_messages           integer,
+   last_from_name         character varying(32),
+   last_from_id           character varying(32),
+   last_msg_title         character varying(72),
+   last_msg_id            character varying(8),
+   last_sent              integer,
+   total_messages         integer,
+   virtual_dir            text,
+   show_popup             integer,
+   primary key            (member_id)
+);
+
+create table ib_search_log (
+   log_id                 integer                     not null default '0',
+   author_id              character varying(32),
+   member_name            character varying(32),
+   date                   integer,
+   topic_title            character varying(128),
+   post                   text,
+   forum_id               integer                     not null default '0',
+   topic_id               integer                     not null default '0',
+   post_id                integer                     default '0',
+   poster_ip              character varying(32),
+   primary key            (log_id)
+);
+
+create table ib_ssi_templates (
+   id                     character varying(24)       not null,
+   template               text,
+   export_filename        character varying(32),
+   primary key            (id)
+);
+
+create table ib_templates (
+   id                     character varying(24)       not null,
+   template               text,
+   name                   character varying(128),
+   primary key            (id)
+);
+
+create table ib_member_titles (
+   id                     integer                     not null,
+   posts                  integer,
+   title                  character varying(128),
+   advance_group          integer,
+   pips                   character varying(64),
+   primary key            (id)
+);
+
+create table ib_moderator_logs (
+   id                     integer                     not null,
+   forum_id               integer                     default '0',
+   topic_id               integer                     default '0',
+   post_id                integer                     default '0',
+   member_id              character varying(32)       not null,
+   member_name            character varying(32)       not null,
+   remote_addr            character varying(32),
+   http_referer           character varying(255),
+   time                   integer,
+   topic_title            character varying(128),
+   action                 character varying(128),
+   query_string           character varying(128),
+   primary key            (id)
+);
+
+create table ib_mod_email (
+   id                     integer                     not null,
+   forum_id               integer                     default '0',
+   email                  character varying(128),
+   text                   text,
+   primary key            (id)
+);
+
+create table ib_mod_posts (
+   id                     integer                     not null default '0',
+   author                 character varying(128),
+   ip_addr                character varying(32),
+   post_date              integer,
+   post                   text,
+   author_type            integer,
+   topic_id               integer                     default '0',
+   forum_id               integer                     default '0',
+   type                   character varying(16),
+   post_id                integer,
+   attach_id              integer                     default '',
+   primary key            (id)
+);
+
+create table ib_forum_posts (
+   post_id                integer                     default '0',
+   author                 character varying(32),
+   enable_sig             character varying(8),
+   enable_emo             character varying(8),
+   ip_addr                character varying(16),
+   post_date              integer,
+   post_icon              integer,
+   post                   text,
+   author_type            integer,
+   queued                 integer,
+   topic_id               integer,
+   forum_id               integer,
+   attach_id              character varying(64),
+   attach_hits            integer,
+   attach_type            character varying(128),
+   primary key            (post_id)
+);
+
+create table ib_search_results (
+   id                     character varying(32)       not null,
+   date                   integer,
+   _where                 text,
+   keywords               character varying(128),
+   _order                 character varying(8),
+   prune                  integer,
+   prune_type             character varying(10),
+   primary key            (id)
+);
+
+create table ib_board_statistics (
+   stats_id               character varying(8)        not null,
+   total_members          integer,
+   last_reg_member_n      character varying(32),
+   last_reg_member_id     character varying(32),
+   last_post_date         integer,
+   last_poster_n          character varying(32),
+   last_poster_id         character varying(16),
+   total_topics           integer,
+   total_replies          integer,
+   primary key            (stats_id)
+);
+
+create table ib_calendar (
+   member_id              character varying(32)       not null,
+   member_name            character varying(32)       not null,
+   day                    integer                     not null,
+   month                  integer                     not null,
+   year                   integer                     not null,
+   time_adjust            character varying(4),
+   primary key            (member_id)
+);

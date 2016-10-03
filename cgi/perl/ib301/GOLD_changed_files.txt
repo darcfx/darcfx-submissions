@@ -1,0 +1,81 @@
+----------------------
+Software: Ikonboard
+Version: v3.0 GOLD
+Release Date: TBD
+----------------------
+
+ikonboard.cgi
+
+############################
+# DATA
+############################
+
+
+############################
+# DATABASE
+############################
+
+
+
+############################
+# SOURCES / ADMIN
+############################
+
+Authorise.pm
+Category.pm
+DBMClient.pm
+MemberControl.pm
+ModControl.pm
+Options.pm
+SQLClient.pm
+
+############################
+# SOURCES
+############################
+
+Boards.pm
+Calendar.pm
+Help.pm
+Lib/FUNC.pm
+LogInOut.pm
+iTextparser.pm
+Misc/Invite.pm
+Misc/MailMember.pm
+ModCP.pm
+Online.pm
+Post.pm
+Profile.pm
+Register.pm
+Sessions.pm
+UserCP/Messenger.pm
+
+############################
+# SKINS
+############################
+// Remember to update the corresponding .cfg file
+// or you will get unexpected results when editing
+// the HTML via the adminCP
+
+MessengerView.pm
+PollView.pm
+PostView.pm
+Universal.pm
+
+
+
+############################
+# LANGUAGES
+############################
+
+ErrorWords.pm
+PostWords.pm
+MessengerWords.pm
+
+
+############################
+# iB_HTML
+############################
+
+/non-cgi/Skin/Default/images/bar.gif
+/non-cgi/Skin/Default/images/bar_left.gif
+/non-cgi/Skin/Default/images/bar_right.gif

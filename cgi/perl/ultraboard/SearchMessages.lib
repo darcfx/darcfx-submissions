@@ -1,0 +1,163 @@
+###############################################################################
+# SearchMessages.lib                                                          #
+###############################################################################
+# UltraBoard Ver. 1.62 by UltraScripts.com                                    #
+# Scripts written by Jacky W.W. Yung, WebMaster@UltraScripts.com              #
+# Available from http://www.UltraScripts.com/UltraBoard/                      #
+# --------------------------------------------------------------------------- #
+# PROGRAM NAME : UltraBoard                                                   #
+# VERSION : 1.62                                                              #
+# LAST MODIFIED : 29/07/1999                                                  #
+# =========================================================================== #
+# COPYRIGHT NOTICE :                                                          #
+#                                                                             #
+# Copyright (c) 1999 Jacky Yung. All Rights Reserved.                         #
+#                                                                             #
+# This program is free software; you can change or modify it as you see fit.  #
+# However, modified versions cannot be sold or distributed.  You cannot alter #
+# the copyright and "powered by" notices throughout the scripts. These        #
+# notices must be clearly visible to the end users.                           #
+#                                                                             #
+# WARRANTY DISCLAIMER:                                                        #
+#                                                                             #
+# THIS PROGRAM IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT WITHOUT #
+# ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR       #
+# FITNESS FOR A PARTICULAR PURPOSE.                                           #
+###############################################################################
+
+###############################################################################
+# SearchMessages                                                              #
+###############################################################################
+sub SearchMessages {
+	$NowTime=time;
+	$DaysToSeconds=86400*$in{'DateDays'};
+	$Count=0;
+	$in{'Keywords'}=~s/\@/\\\@/sg;
+	$in{'Keywords'}=~s/\&/\\\&/sg;
+	$in{'Keywords'}=~s/\|/\\\|/sg;
+	$in{'Keywords'}=~s/\^/\\\^/sg;
+	$in{'Keywords'}=~s/\[/\\\[/sg;
+	$in{'Keywords'}=~s/\]/\\\]/sg;
+	$in{'Keywords'}=~s/\%/\\\%/sg;
+	$in{'Keywords'}=~s/\//\\\//sg;
+	$in{'Keywords'}=~s/\\/\\\\/sg;
+	$in{'Keywords'}=~s/\</\\\</sg;
+	$in{'Keywords'}=~s/\>/\\\>/sg;
+	$in{'Keywords'}=~s/\$/\\\$/sg;
+	@KeyWords = split(/ /, $in{'Keywords'});
+	for ($i=0;$i<$in{'Count'};$i++) {
+		if ($in{"BoardID_".$i}) {
+			opendir(POSTS,"$DBPath/".$in{"BoardID_".$i})||&CGIError("Couldn't open/read the $DBPath/".$in{"BoardID_".$i}." directory<br>\nReason : $!");
+				@POSTS_DATA = grep{m/.*\.post/}readdir(POSTS);
+			closedir(POSTS);	
+			open(BOARD,"$DBPath/".$in{"BoardID_".$i}."/board.list")||&CGIError("Couldn't open/read the board.list file<br>\nPath: $DBPath/".$in{"BoardID_".$i}."<br>\nReason : $!");
+				flock(BOARD,1) if ($FLock);
+				@BOARD_DATA=<BOARD>;
+			close(BOARD);
+			@BoardInfo=&DecodeDBOutput($BOARD_DATA[0]);
+			foreach $POST (@POSTS_DATA) {
+				open(POST,"$DBPath/".$in{"BoardID_".$i}."/$POST")||&CGIError("Couldn't open/read the $POST file<br>\nPath: $DBPath/".$in{"BoardID_".$i}."<br>\nReason : $!");
+					flock(POST,1) if ($FLock);
+					@POST_DATA=<POST>;
+				close(POST);
+				@PostInfo=&DecodeDBOutput($POST_DATA[0]);
+				@PostStat=&DecodeDBOutput($POST_DATA[1]);
+				if ((($PostStat[2]+$DaysToSeconds)<$NowTime)&&($in{'DateType'} eq "more")&&($in{'DateDays'} ne "")) {
+					&CheckWords;
+				}elsif ((($PostStat[2]+$DaysToSeconds)>$NowTime)&&($in{'DateType'} eq "less")&&($in{'DateDays'} ne "")) {
+					&CheckWords;
+				}elsif ($in{'DateDays'} eq ""){
+					&CheckWords;
+				}
+			}
+		}
+	}
+	if ($in{'SortOrder'} eq "Ascend") {
+		if (($in{'SortField'} eq "replies")||($in{'SortField'} eq "lastmodified")) {
+			@SortedList=sort{$SortField{$a} <=> $SortField{$b}} keys %SortField;
+		}else{
+			@SortedList=sort{$SortField{$a} cmp $SortField{$b}} keys %SortField;
+		}
+    }else{
+		if (($in{'SortField'} eq "replies")||($in{'SortField'} eq "lastmodified")) {
+			@SortedList=sort{$SortField{$b} <=> $SortField{$a}} keys %SortField;
+		}else{
+			@SortedList=sort{$SortField{$b} cmp $SortField{$a}} keys %SortField;
+		}
+    }
+}
+
+###############################################################################
+# CheckWords                                                                  #
+###############################################################################
+sub CheckWords {
+	$Found=0;
+	@ReplyInfo=();
+	for ($k=2;$k<=$#POST_DATA;$k++) {
+		@Reply=&DecodeDBOutput($POST_DATA[$k]);
+		if (($Reply[2]) && (!$Reply[1])) {
+			$Reply[1]=(&GetMemberData($Reply[2]))[1];
+		}
+		push @ReplyInfo,[@Reply];
+	}
+	if (($PostInfo[2]) && (!$PostInfo[1])) {
+		$PostInfo[1]=(&GetMemberData($PostInfo[2]))[1];
+	}
+	foreach $KeyWord (@KeyWords) {
+		$Found=0;
+		if (($in{'Method'}=~/Subject/)&&($PostInfo[0]=~/$KeyWord/i)) {
+			$Found++;
+		}elsif (($in{'Method'}=~/Message/)&&($PostInfo[7]=~/$KeyWord/i)) {
+			$Found++;
+		}elsif (($in{'Method'}=~/UserName/)&&(($PostInfo[1]=~/$KeyWord/i)||($PostInfo[2]=~/$KeyWord/i))) {
+			$Found++;
+		}else{
+			for ($k=0;$k<=$#ReplyInfo;$k++) {
+				if (($in{'Method'}=~/Subject/)&&($ReplyInfo[$k][1]=~/$KeyWord/i)) {
+					$Found++;
+					last;
+				}elsif (($in{'Method'}=~/Message/)&&($ReplyInfo[$k][8]=~/$KeyWord/i)) {
+					$Found++;
+					last;
+				}elsif (($in{'Method'}=~/UserName/)&&(($ReplyInfo[$k][2]=~/$KeyWord/i)||($ReplyInfo[$k][3]=~/$KeyWord/i))) {
+					$Found++;
+					last;
+				}
+			}
+		}
+		if (($in{'Bealoon'} eq "Or")&&($Found>0)) {
+			$Found=1;
+			last;
+		}elsif (($in{'Bealoon'} eq "And")&&($Found<=0)) {
+			$Found=0;
+			last;
+		}
+	}
+	if (($Found > 0)||(!$in{'Keywords'})) {
+		$POST=~s/.post//g;
+		push (@PostID,
+			$PostInfo[0].$Spliter.
+			$PostInfo[1].$Spliter.
+			$PostInfo[2].$Spliter.
+			$PostInfo[9].$Spliter.
+			$PostStat[0].$Spliter.
+			$PostStat[2].$Spliter.
+			$BoardInfo[0].$Spliter.
+			$BoardInfo[1].$Spliter.
+			$POST.$Spliter.
+			$PostInfo[8]
+		);
+		if ($in{'SortField'} eq "topic") {
+			$SortField{$Count++}=lc($PostInfo[0]);
+		}elsif ($in{'SortField'} eq "originator") {
+			$SortField{$Count++}=lc($PostInfo[1]);	
+		}elsif ($in{'SortField'} eq "replies") {
+			$SortField{$Count++}=$PostStat[0];	
+		}elsif ($in{'SortField'} eq "lastmodified") {
+			$SortField{$Count++}=$PostStat[2];	
+		}
+	}
+}
+###############################################################################
+1;# End of SearchMessages Function
+###############################################################################

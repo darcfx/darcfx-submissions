@@ -1,0 +1,451 @@
+###############################################################################
+# HTML.lib                                                                    #
+###############################################################################
+# UltraBoard Ver. 1.62 by UltraScripts.com                                    #
+# Scripts written by Jacky W.W. Yung, WebMaster@UltraScripts.com              #
+# Available from http://www.UltraScripts.com/UltraBoard/                      #
+# --------------------------------------------------------------------------- #
+# PROGRAM NAME : UltraBoard                                                   #
+# VERSION : 1.62                                                              #
+# LAST MODIFIED : 29/07/1999                                                  #
+# =========================================================================== #
+# COPYRIGHT NOTICE :                                                          #
+#                                                                             #
+# Copyright (c) 1999 Jacky Yung. All Rights Reserved.                         #
+#                                                                             #
+# This program is free software; you can change or modify it as you see fit.  #
+# However, modified versions cannot be sold or distributed.  You cannot alter #
+# the copyright and "powered by" notices throughout the scripts. These        #
+# notices must be clearly visible to the end users.                           #
+#                                                                             #
+# WARRANTY DISCLAIMER:                                                        #
+#                                                                             #
+# THIS PROGRAM IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT WITHOUT #
+# ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR       #
+# FITNESS FOR A PARTICULAR PURPOSE.                                           #
+###############################################################################
+
+###############################################################################
+# HTMLHeader                                                                  #
+###############################################################################
+sub HTMLHeader {
+	if ($HeaderDefine ne "TRUE") {
+		$HeaderDefine = "TRUE";
+		return "Content-type: text/html\n\n";
+	}
+}
+
+###############################################################################
+# Head                                                                        #
+###############################################################################
+sub Head {
+	my ($Title, @Other)=@_;
+	my $HTML;
+	$HTML=<<HTML;
+<html>
+<head>
+<title>$Title</title>
+@Other
+</head>
+HTML
+	return $HTML;
+}
+
+###############################################################################
+# Body                                                                        #
+###############################################################################
+sub Body {
+	my ($BackGround, $BGColor, $Text, $Link, $VLink, $ALink, $LeftMargin, $TopMargin, @Other)=@_;
+	my $HTML;
+	$BackGround	=qq~ background="$BackGround"~								if $BackGround ne "";
+	$BGColor	=qq~ bgcolor="#$BGColor"~									if $BGColor ne "";
+	$Text		=qq~ text="#$Text"~											if $Text ne "";
+	$Link		=qq~ link="#$Link"~											if $Link ne "";
+	$VLink		=qq~ vlink="#$VLink"~										if $VLink ne "";
+	$ALink		=qq~ alink="#$ALink"~										if $ALink ne "";
+	$LeftMargin	=qq~ leftmargin="$LeftMargin" marginwidth="$LeftMargin"~	if $LeftMargin ne "";
+	$TopMargin	=qq~ topmargin="$TopMargin" marginheight="$TopMargin"~		if $TopMargin ne "";
+	my($Other) = @Other ? " @Other" : "";
+	$HTML=qq~<body$BackGround$BGColor$Text$Link$VLink$ALink$LeftMargin$TopMargin$Other>\n~;
+	return $HTML;
+}
+
+###############################################################################
+# CBody                                                                       #
+###############################################################################
+sub CBody {
+	my $HTML;
+	$HTML=<<HTML;
+</body>
+</html>
+HTML
+	return $HTML;
+}
+
+###############################################################################
+# Table                                                                       #
+###############################################################################
+sub Table {
+	my ($Width, $Align, $CellSpacing, $CellPadding, $BackGround, $BGColor, @Other)=@_;
+	my $HTML;
+	$Width			=qq~ width="$Width"~				if $Width ne "";
+	$Align			=qq~ align="$Align"~				if $Align ne "";
+	$CellSpacing	=qq~ cellspacing="$CellSpacing"~	if $CellSpacing ne "";
+	$CellPadding	=qq~ cellpadding="$CellPadding"~	if $CellPadding ne "";
+	$BackGround		=qq~ background="$BackGround"~		if $BackGround ne "";
+	$BGColor		=qq~ bgcolor="#$BGColor"~			if $BGColor ne "";
+	my($Other)		= @Other ? " @Other" : "";
+	$HTML=qq~<table$Width border="0"$CellSpacing$CellPadding$Align$BackGround$BGColor$Other>\n~;
+	return $HTML;
+}
+
+###############################################################################
+# CTable                                                                      #
+###############################################################################
+sub CTable {
+	return "</table>\n";
+}
+
+###############################################################################
+# BTable                                                                      #
+###############################################################################
+sub BTable {
+	my ($Width, $Align, $OutCellSpacing, $OutCellPadding, $InCellSpacing, $InCellPadding, $BorderColor, $BackGround, $BGColor, @Other)=@_;
+	my $HTML;
+	$HTML=	&Table($Width,$Align,$OutCellSpacing,$OutCellPadding,"",$BorderColor).
+			&Tr().&Td().
+			&Table("100%","CENTER",$InCellSpacing,$InCellPadding,$BackGround,$BGColor,@Other);
+	return $HTML;
+}
+
+###############################################################################
+# CBTable                                                                     #
+###############################################################################
+sub CBTable {
+	return	&CTable().&CTd().&CTr().&CTable();
+}
+
+###############################################################################
+# Font                                                                        #
+###############################################################################
+sub Font {
+	my ($TextFace, $TextSize, $Color, @Other)=@_;
+	my $HTML;
+	$TextFace	=qq~ face="$TextFace"~	if $TextFace ne "";
+	$TextSize	=qq~ size="$TextSize"~	if $TextSize ne "";
+	$Color		=qq~ color="#$Color"~	if $Color ne "";
+	my($Other)	= @Other ? " @Other" : "";
+	$HTML=qq~<font$TextFace$TextSize$Color$Other>~;
+	return $HTML;
+}
+
+###############################################################################
+# CFont                                                                       #
+###############################################################################
+sub CFont {
+	return "</font>";
+}
+
+###############################################################################
+# Tr                                                                          #
+###############################################################################
+sub Tr {
+	my ($Align, $VAlign, $BGColor, @Other)=@_;
+	my $HTML;
+	$Align		=qq~ align="$Align"~		if $Align ne "";
+	$VAlign		=qq~ valign="$VAlign"~		if $VAlign ne "";
+	$BGColor	=qq~ bgcolor="#$BGColor"~	if $BGColor ne "";
+	my($Other)	= @Other ? " @Other" : "";
+	$HTML=qq~<tr$Align$VAlign$BGColor$Other>\n~;
+	return $HTML;
+}
+
+###############################################################################
+# CTr                                                                         #
+###############################################################################
+sub CTr {
+	return "</tr>\n";
+}
+
+###############################################################################
+# Td                                                                          #
+###############################################################################
+sub Td {
+	my ($Width, $Height, $ColSpan, $RowSpan, $Align, $VAlign, $NoWrap, $BGColor, $BackGround, @Other)=@_;
+	my $HTML;
+	$Width		=qq~ width="$Width"~			if $Width ne "";
+	$Height		=qq~ height="$Height"~			if $Height ne "";
+	$ColSpan	=qq~ colspan="$ColSpan"~		if $ColSpan ne "";
+	$RowSpan	=qq~ rowspan="$RowSpan"~		if $RowSpan ne "";
+	$Align		=qq~ align="$Align"~			if $Align ne "";
+	$VAlign		=qq~ valign="$VAlign"~			if $VAlign ne "";
+	$NoWrap		=qq~ nowrap~					if $NoWrap ne "";
+	$BGColor	=qq~ bgcolor="#$BGColor"~		if $BGColor ne "";
+	$BackGround	=qq~ background="$BackGround"~	if $BackGround ne "";
+	my($Other)	= @Other ? " @Other" : "";
+	$HTML=qq~<td$Width$Height$ColSpan$RowSpan$Align$VAlign$NoWrap$BGColor$BackGround$Other>~;
+	return $HTML;
+}
+
+###############################################################################
+# CTd                                                                         #
+###############################################################################
+sub CTd {
+	return "</td>\n";
+}
+
+###############################################################################
+# Link                                                                        #
+###############################################################################
+sub Link {
+	my ($URL, $Target, $Title, $MouseOver, @Other)=@_;
+	my $HTML;
+	$URL	=qq~ href="$URL"~		if $URL ne "";
+	$Target	=qq~ target="$Target"~	if $Target ne "";
+	$Title	=qq~ title="$Title"~	if $Title ne "";
+    if ($MouseOver ne "") {
+        $MouseOver=~s/\'/\\\'/ig;
+        #$MouseOver=~s/\;/\\\;/ig;
+        #$MouseOver=~s/\&/\\\&/ig;
+        $MouseOver=~s/\"/&quot;/ig;
+        $MouseOver =qq~ OnMouseOver="window.status='$MouseOver';return true;" OnMouseOut="window.status=''"~;    
+    }
+    my($Other) = @Other ? " @Other" : "";
+	$HTML=qq~<a$URL$Target$Title$MouseOver$Other>~;
+	return $HTML;
+}
+
+###############################################################################
+# CLink                                                                       #
+###############################################################################
+sub CLink {
+	return "</a>";
+}
+
+###############################################################################
+# Image                                                                       #
+###############################################################################
+sub Image {
+	my ($URL, $Width, $Height, $HSpace, $VSpace, $Border, $Alt, @Other)=@_;
+	my $HTML;
+	$URL	=qq~ src="$URL"~		if $URL ne "";
+	$Width	=qq~ width="$Width"~	if $Width ne "";
+	$Height	=qq~ height="$Height"~	if $Height ne "";
+	$HSpace	=qq~ hspace="$HSpace"~	if $HSpace ne "";
+	$VSpace	=qq~ vspace="$VSpace"~	if $VSpace ne "";
+	$Border	=qq~ border="$Border"~	if $Border ne "";
+	$Alt	=qq~ alt="$Alt"~		if $Alt ne "";
+	my($Other) = @Other ? " @Other" : "";
+	$HTML=qq~<img$URL$Width$Height$HSpace$VSpace$Border$Alt$Other>~;
+	return $HTML;
+}
+
+###############################################################################
+# Form                                                                        #
+###############################################################################
+sub Form {
+	my ($Action, $Method, $Target, $Enctype, @Other)=@_;
+	my $HTML;
+	$Action		=qq~ action="$Action"~		if $Action ne "";
+	$Method		=qq~ method="$Method"~		if $Method ne "";
+	$Target		=qq~ target="$Target"~		if $Target ne "";
+	$Enctype	=qq~ enctype="$Enctype"~	if $Enctype ne "";
+	my($Other)	= @Other ? " @Other" : "";
+	$HTML=qq~<form$Action$Method$Target$Enctype$Other>~;
+	return $HTML;
+}
+
+###############################################################################
+# CForm                                                                       #
+###############################################################################
+sub CForm {
+	return "</form>";
+}
+
+###############################################################################
+# HiddenBox                                                                   #
+###############################################################################
+sub HiddenBox {
+	my ($Name, $Value, @Other)=@_;
+	my $HTML;
+	$Name		=qq~ name="$Name"~				if $Name ne "";
+	$Value		=qq~ value="$Value"~			if $Value ne "";
+	my($Other) = @Other ? " @Other" : "";
+	$HTML=qq~<input type="Hidden"$Name$Value$Other>~;
+	return $HTML;
+}
+
+###############################################################################
+# TextBox                                                                     #
+###############################################################################
+sub TextBox {
+	my ($Name, $Value, $Size, $MaxLength, $Style, @Other)=@_;
+	my $HTML;
+	$Name		=qq~ name="$Name"~				if $Name ne "";
+	$Value		=qq~ value="$Value"~			if $Value ne "";
+	$Size		=qq~ size="$Size"~				if $Size ne "";
+	$MaxLength	=qq~ maxlength="$MaxLength"~	if $MaxLength ne "";
+	$Style		=qq~ style="$Style"~			if $Style ne "";
+	my($Other) = @Other ? " @Other" : "";
+	$HTML=qq~<input type="Text"$Name$Value$Size$MaxLength$Style class="TextBox"$Other>~;
+	return $HTML;
+}
+
+###############################################################################
+# PasswordBox                                                                 #
+###############################################################################
+sub PasswordBox {
+	my ($Name, $Value, $Size, $MaxLength, $Style, @Other)=@_;
+	my $HTML;
+	$Name		=qq~ name="$Name"~					if $Name ne "";
+	$Value		=qq~ value="$Value"~				if $Value ne "";
+	$Size		=qq~ size="$Size"~					if $Size ne "";
+	$MaxLength	=qq~ maxlength="$MaxLength"~		if $MaxLength ne "";
+	$Style		=qq~ style="$Style"~				if $Style ne "";
+	my($Other) = @Other ? " @Other" : "";
+	$HTML=qq~<input type="Password"$Name$Value$Size$MaxLength$Style class="PasswordBox"$Other>~;
+	return $HTML;
+}
+
+###############################################################################
+# TextArea                                                                    #
+###############################################################################
+sub TextArea {
+	my ($Name, $Value, $Cols, $Rows, $Wrap, $Style, @Other)=@_;
+	my $HTML;
+	$Name		=qq~ name="$Name"~		if $Name ne "";
+	$Value		=qq~$Value~	if $Value ne "";
+	$Cols		=qq~ cols="$Cols"~		if $Cols ne "";
+	$Rows		=qq~ rows="$Rows"~		if $Rows ne "";
+	$Wrap		=qq~ wrap="$Wrap"~		if $Wrap ne "";
+	$Style		=qq~ style="$Style"~	if $Style ne "";
+	my($Other) = @Other ? " @Other" : "";
+	$HTML=qq~<textarea$Name$Cols$Rows$Wrap$Style class="TextArea"$Other>$Value</textarea>\n~;
+	return $HTML;
+}
+
+###############################################################################
+# Select                                                                      #
+###############################################################################
+sub Select {
+	my ($Name, $Size, $Style, $Multiple, $Select, @Option)=@_;
+	my ($HTML, $i);
+	$Name		=qq~ name="$Name"~		if $Name ne "";
+	$Size		=qq~ size="$Size"~		if $Size ne "";
+	$Style		=qq~ style="$Style"~	if $Style ne "";
+	$Multiple	=qq~ multiple~			if $Multiple ne "";
+	$HTML=<<HTML;
+<select$Name$Size$Style class="Select"$Multiple>\n
+HTML
+	for ($i=0;$i<=$#Option;$i++) {
+		if ($Select eq $Option[$i+1]) {
+			$Selected = qq~ selected~; 
+		}else{
+			$Selected = ""; 
+		}
+		$HTML.="<option value=\"".$Option[$i+1]."\"$Selected>".$Option[$i]."</option>\n";
+		$i++;
+	}
+	$HTML.=<<HTML;
+</select>\n
+HTML
+	return $HTML;
+}
+
+###############################################################################
+# Checkbox                                                                    #
+###############################################################################
+sub Checkbox {
+	my ($Name, $Value, $Style, $Checked, @Other)=@_;
+	my $HTML;
+	$Name		=qq~ name="$Name"~		if $Name ne "";
+	if (($Value eq $Checked)&&($Checked ne "")) {
+		$Checked	=qq~ checked~;
+	}else{
+		$Checked	="";
+	}
+	$Value		=qq~ value="$Value"~	if $Value ne "";
+	$Style		=qq~ style="$Style"~	if $Style ne "";
+	my($Other) = @Other ? " @Other" : "";
+	$HTML=qq~<input type="Checkbox"$Name$Value$Checked$Style class="Checkbox"$Other>~;
+	return $HTML;
+}
+
+###############################################################################
+# Radio                                                                       #
+###############################################################################
+sub Radio {
+	my ($Name, $Value, $Checked, $Style, @Other)=@_;
+	my $HTML;
+	if (($Value eq $Checked)&&($Checked ne "")) {
+		$Checked	=qq~ checked~;
+	}else{
+		$Checked	="";
+	}
+	$Name		=qq~ name="$Name"~		if $Name ne "";
+	$Value		=qq~ value="$Value"~	if $Value ne "";
+	$Style		=qq~ style="$Style"~	if $Style ne "";
+	my($Other) = @Other ? " @Other" : "";
+	$HTML=qq~<input type="Radio"$Name$Value$Checked$Style class="Radio"$Other>~;
+	return $HTML;
+}
+
+###############################################################################
+# Submit                                                                      #
+###############################################################################
+sub Submit {
+	my ($Name, $Value, $Style, @Other)=@_;
+	my $HTML;
+	$Name		=qq~ name="$Name"~		if $Name ne "";
+	$Value		=qq~ value="$Value"~	if $Value ne "";
+	$Style		=qq~ style="$Style"~	if $Style ne "";
+	my($Other) = @Other ? " @Other" : "";
+	$HTML=qq~<input type="Submit"$Name$Value$Style class="Button"$Other>~;
+	return $HTML;
+}
+
+###############################################################################
+# Reset                                                                       #
+###############################################################################
+sub Reset {
+	my ($Value, $Style, @Other)=@_;
+	my $HTML;
+	$Value		=qq~ value="$Value"~	if $Value ne "";
+	$Style		=qq~ style="$Style"~	if $Style ne "";
+	my($Other) = @Other ? " @Other" : "";
+	$HTML=qq~<input type="Reset"$Value$Style class="Button"$Other>~;
+	return $HTML;
+}
+
+###############################################################################
+# Button                                                                      #
+###############################################################################
+sub Button {
+	my ($Name, $Value, $Style, @Other)=@_;
+	my $HTML;
+	$Name		=qq~ name="$Name"~		if $Name ne "";
+	$Value		=qq~ value="$Value"~	if $Value ne "";
+	$Style		=qq~ style="$Style"~	if $Style ne "";
+	my($Other) = @Other ? " @Other" : "";
+	$HTML=qq~<input type="Button"$Name$Value align="MIDDLE"$Style class="Button"$Other>~;
+	return $HTML;
+}
+
+###############################################################################
+# HR                                                                          #
+###############################################################################
+sub HR {
+	my ($Align, $Size, $Width, $Style, $NoShade, @Other)=@_;
+	my $HTML;
+	$Align		=qq~ align="$Align"~	if $Align ne "";
+	$Size		=qq~ size="$Size"~		if $Size ne "";
+	$Width		=qq~ width="$Width"~	if $Width ne "";
+	$Style		=qq~ style="$Style"~	if $Style ne "";
+	$NoShade	=qq~ noshade~			if $NoShade ne "";
+	my($Other) = @Other ? " @Other" : "";
+	$HTML=qq~<hr$Align$Size$Width$Style class="HR"$NoShade$Other>\n~;
+	return $HTML;
+}
+###############################################################################
+1;# End of HTML.lib file
+###############################################################################

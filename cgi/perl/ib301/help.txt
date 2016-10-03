@@ -1,0 +1,38 @@
+[Registration]
+Depending on how this board is set up, you may have to register to post in certain forums. Registering will also 'reserve' your chosen name so no other registered user can post with the same name as you. To register, simply click on the 'Register' link at the top of the board. Fill in the simple form and you'll be informed whether the board administrator wishes to verify your email address.
+[Posting]
+Posting refers to either starting a new topic of conversation, or replying to an existing topic of conversation. To reply, simply click on the 'add new reply' button at the top of the page and enter your message into the form. If you get an error informing you that you cannot post in that forum, then check to make sure you are registered and logged in as the board administrator may have restricted posting permission for guests in that forum. The same steps apply for starting a new topic of conversation.
+[Logging In]
+If you are registered, you may be prompted to log in. This will ask you for the username and password that you specified upon registration. This will allow you access to your members account and your Control Panel. Until you log in, you are treated as a guest.
+To log in, simply click on the 'Log In' link at the top of the page and enter your account details. If you wish to store a copy of your member ID and encrypted password in a 'cookie' then choose the amount of time from the radio buttons before submitting the form. This will then automatically log you in when you return. If you are using a shared computer such as one in an internet cafe, we recommend that you don't store your account details in cookies for security purposes.
+[Logging Out]
+Before you leave the board, you may wish to log out. This will terminate your session and remove the member ID and password cookies from your computer. We recommend you do this if you are using a shared computer.
+[Your Control Panel: Account Overview]
+This provides you with a summary of your account and also has a quick guide to the various sections in the control panel.
+[Your Control Panel: Topic Tracker]
+The topic tracker provides you with information on the topics that you are subscribed to (See Topic Subscriptions). You can view the topics, delete the subscription or just check on the topic status.
+[Your Control Panel: Personal Information]
+This help topic covers both parts of this feature.
+> Personal Profile
+This profile is viewable by other members of the board. It's allows you to enter any contact information you wish to share with the other members. You may choose to 'hide' your email address from the other members. The board administrator may have chosen to use an 'email form' for other members to contact you. This allows your email address to remain private whilst allowing other members to contact you.
+Your signature is automatically appended to every post you make (unless you specify to not add the signature when posting). It works much like an 'email' signature.
+> Avatar Options
+Here you can set an 'avatar' to that is displayed under your username when you post a message. You can either choose from the pre-installed selection, or enter a URL for an avatar you have uploaded on your server.
+[Topic Subscriptions]
+This feature is for registered members only. You can 'subscribe' to any topic on this bulletin board by clicking on the 'track this topic' link displayed at the bottom of the topic. This will add the topic to your 'Topic Tracker' and you will receive notification via email each time a message is posted.
+[Print Topic]
+This will display a printer friendly version of the topic suitable for printing. The link can be found at the bottom of each topic.
+[Email to a friend]
+This feature is for registered members only.
+You can email a topic to a friend by clicking on the link displayed at the bottom of each topic. This will allow you to send a custom message with the email.
+[Starting a Poll]
+This feature is for registered members only.
+Clicking on the 'New Poll' button will allow you to enter your poll choices. These choices must be in the following format. One choice per line, no blank lines between choices and the number of choices must be between 2 and 10. You must also enter a title for your poll and a message to be displayed underneath the poll choices.
+[Voting in a Poll]
+This feature is for registered members only.
+You can only vote once in a poll. Simply click on the radio button of your choice and press the 'Vote' button found underneath the poll choices. Your vote will now be added.
+[Cookies]
+A "Cookie" is the name given to a small piece of information stored on your computer. This information is set by Ikonboard to remember your member ID and password, last visit times and other preferences. This is not used to collect any other information from you and Ikonboard will only access the cookies set by itself. No other information can be read from your computer.
+You can elect not to store your member ID and password in a cookie when you log in. Your password is encrypted for extra security.
+[Member list]
+You can browse the member list by clicking on the 'Member List' button found at the top of all the ikonboard pages. You can set your own sort options by adjusting the drop down boxes at the top of the Member List page.

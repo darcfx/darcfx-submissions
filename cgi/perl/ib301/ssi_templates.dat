@@ -1,0 +1,5 @@
+ONLINE_COUNT|^|online_count.txt|^|<b>Number of users active on our forum</b>\n<br>\n<%number of guests%> guests, <%number of members%> members making a total of <%total online%> users
+ONLINE_FORMAT|^|online_format.txt|^|&gt; <a href="<%url to profile%>"><%member name%></a><br>
+ONLINE_LIST|^|online_list.txt|^|<table border='0' width='100%'>\n<tr>\n<td>\n<%list members%>\n</tr>\n</td>\n</table>
+POST_TOTALS|^|post_totals.txt|^|<b>Board statistics</b>\n<br>\nWe have a total of <%total posts%> (<%total topics%> topics + <%total replies%> replies)
+LAST_POSTED|^|last_posted.txt|^|<b>Last Post</b>\n<br>\n<a href="<%url to topic%>"><%topic title%></a> by <%topic poster%>

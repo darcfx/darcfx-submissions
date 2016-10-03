@@ -1,0 +1,53 @@
+###############################################################################
+# SearchPostID.lib                                                            #
+###############################################################################
+# UltraBoard Ver. 1.62 by UltraScripts.com                                    #
+# Scripts written by Jacky W.W. Yung, WebMaster@UltraScripts.com              #
+# Available from http://www.UltraScripts.com/UltraBoard/                      #
+# --------------------------------------------------------------------------- #
+# PROGRAM NAME : UltraBoard                                                   #
+# VERSION : 1.62                                                              #
+# LAST MODIFIED : 29/07/1999                                                  #
+# =========================================================================== #
+# COPYRIGHT NOTICE :                                                          #
+#                                                                             #
+# Copyright (c) 1999 Jacky Yung. All Rights Reserved.                         #
+#                                                                             #
+# This program is free software; you can change or modify it as you see fit.  #
+# However, modified versions cannot be sold or distributed.  You cannot alter #
+# the copyright and "powered by" notices throughout the scripts. These        #
+# notices must be clearly visible to the end users.                           #
+#                                                                             #
+# WARRANTY DISCLAIMER:                                                        #
+#                                                                             #
+# THIS PROGRAM IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT WITHOUT #
+# ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR       #
+# FITNESS FOR A PARTICULAR PURPOSE.                                           #
+###############################################################################
+
+###############################################################################
+# SearchPostID                                                                #
+###############################################################################
+sub SearchPostID {
+	my ($PostID)	= $_[0];
+	my ($First)		= 1;
+	my ($Last)		= $TotalPosts;
+	my ($Middle);
+	my ($Count)=0;
+	while (($First <= $Last)&&($Count<50)) {
+		$Middle=int (($First+$Last)/2);
+		@PostInfo=&DecodeDBOutput($BOARD_DATA[$Middle]);
+		if ($PostInfo[1] == $PostID) {
+			return $Middle;		
+		}elsif ($PostInfo[1] > $PostID) {
+			$Last=$Middle-1;
+		}elsif ($PostInfo[1] < $PostID) {
+			$First=$Middle+1;
+		}
+		$Count++;
+	}
+	return -1;
+}
+###############################################################################
+1;# End of SearchPostID Function
+###############################################################################

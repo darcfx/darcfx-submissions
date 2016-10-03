@@ -1,0 +1,1065 @@
+###############################################################################
+# Common.lib                                                                  #
+###############################################################################
+# UltraBoard Ver. 1.62 by UltraScripts.com                                    #
+# Scripts written by Jacky W.W. Yung, WebMaster@UltraScripts.com              #
+# Available from http://www.UltraScripts.com/UltraBoard/                      #
+# --------------------------------------------------------------------------- #
+# PROGRAM NAME : UltraBoard                                                   #
+# VERSION : 1.62                                                              #
+# LAST MODIFIED : 29/07/1999                                                  #
+# =========================================================================== #
+# COPYRIGHT NOTICE :                                                          #
+#                                                                             #
+# Copyright (c) 1999 Jacky Yung. All Rights Reserved.                         #
+#                                                                             #
+# This program is free software; you can change or modify it as you see fit.  #
+# However, modified versions cannot be sold or distributed.  You cannot alter #
+# the copyright and "powered by" notices throughout the scripts. These        #
+# notices must be clearly visible to the end users.                           #
+#                                                                             #
+# WARRANTY DISCLAIMER:                                                        #
+#                                                                             #
+# THIS PROGRAM IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT WITHOUT #
+# ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR       #
+# FITNESS FOR A PARTICULAR PURPOSE.                                           #
+###############################################################################
+
+###############################################################################
+# Variables                                                                   #
+###############################################################################
+
+$Spliter="\|\^\|";
+
+###############################################################################
+# ParseForm                                                                   #
+###############################################################################
+sub ParseForm{
+	my ($Buffer, @Pairs, $Pair, $Name, $Value);
+	if($ENV{'REQUEST_METHOD'} eq "POST"){
+    	read(STDIN, $Buffer, $ENV{'CONTENT_LENGTH'});
+	}elsif($ENV{'REQUEST_METHOD'} eq "GET"){
+		$Buffer=$ENV{'QUERY_STRING'};
+	}
+	@Pairs = split(/&/, $Buffer);
+	foreach $Pair (@Pairs) {
+		($Name, $Value) = split(/=/, $Pair);
+		$Value =~ tr/+/ /;
+		$Value =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+		#$Value =~ s/<!--(.|\n)*-->//g;
+		#$Value =~ s/\n/<br>/g;
+		$Value =~ s/\r//g;
+		$Value =~ s/^\s+//g;
+		$Value =~ s/\s+$//g;
+		$in{$Name} = $Value;
+	}
+}
+
+###############################################################################
+# CheckBanned                                                                 #
+###############################################################################
+sub CheckBanned {
+	if ($Ban) {
+		open(BAN,"$VarsPath/IPs.ban");
+			flock(BAN,2) if ($FLock);
+			my (@IPs)=<BAN>;
+		close(BAN);
+		chomp (@IPs);
+		open(BAN,"$VarsPath/Hosts.ban");
+			flock(BAN,2) if ($FLock);
+			my (@Hosts)=<BAN>;
+		close(BAN);
+		chomp (@Hosts);
+		foreach $IP (@IPs) {
+			chomp ($IP);
+			if ($ENV{'REMOTE_ADDR'}=~/^$IP/) {
+				&ShowError("BANNED","Sorry, you have been banned.");
+			}
+		}
+		if ($ENV{'REMOTE_HOST'}) {
+			foreach $Host (@Hosts) {
+				chomp ($Host);
+				if ($ENV{'REMOTE_HOST'}=~/$Host$/) {
+					&ShowError("BANNED","Sorry, you have been banned.");
+				}
+			}
+		}		
+	}
+}
+
+###############################################################################
+# GetSession                                                                  #
+###############################################################################
+sub GetSession {
+    my ($SessionID)=@_;
+	my ($UserName, $Password, $IP);
+    return ("-1","") unless (-e "$SessionPath/$SessionID");
+    open(SESSION,"$SessionPath/$SessionID");
+		flock(SESSION,1) if ($FLock);
+        my (@info)=<SESSION>;
+        chomp (@info);
+        my ($UserName, $Password, $IP)=@info;
+	close(SESSION);
+    $UserName =~ s/\\\|n/\n/g;
+    $UserName =~ s/\$\|/\|/g;
+    $Password =~ s/\\\|n/\n/g;
+    $Password =~ s/\$\|/\|/g;
+
+	if ($IP ne $ENV{'REMOTE_ADDR'}) {
+		return ("-1","");
+	}
+    return ($UserName, $Password);
+}
+
+###############################################################################
+# CreateSession                                                               #
+###############################################################################
+sub CreateSession {
+    my ($UserName, $Password)=@_;
+
+    $UserName =~ s/\|/\$\|/g;
+    $UserName =~ s/\n/\\\|n/g;
+
+    $Password =~ s/\|/\$\|/g;
+    $Password =~ s/\n/\\\|n/g;
+	
+    # Remove Older Sessions
+    &RemoveSessions;
+
+    # Build Session ID
+    srand(time);
+    my ($SessionID) = $UserName.".".time.(int(rand(99999)));
+
+    open(SESSION,">$SessionPath/$SessionID");
+		flock(SESSION,2) if ($FLock);
+        print SESSION join ("\n", $UserName, $Password, $ENV{'REMOTE_ADDR'});
+		flock(SESSION,8) if ($FLock);
+	close(SESSION);
+    return $SessionID;
+}
+
+###############################################################################
+# RemoveSessions                                                              #
+###############################################################################
+sub RemoveSessions {
+    my ($File);
+    # Read Session Directory
+    opendir (SESSIONS,"$SessionPath");
+		my (@SessionFiles) = grep(!/^\.\.?$/,readdir(SESSIONS));
+	closedir (SESSIONS);
+    foreach $File (@SessionFiles) {
+        if ((stat("$SessionPath/$File"))[9] + $CleanUpTime < time) {
+            unlink("$SessionPath/$File");
+        }
+    }
+}
+
+###############################################################################
+# SendEmail                                                                   #
+###############################################################################
+sub SendMail{
+	local ($From, $Subject, $Message, $To) = @_;
+	if ($EmailFunction eq "SMTP") {
+		require "$LibPath/Sender.pm";
+		ref ($Sender = new Mail::Sender {smtp => $SendMailLocation, from => $From})||&CGIError("Couldn't open the SMTP server<br>\n SMTP Path: $SendMailLocation<br>\nReason : $Mail::Sender::Error");
+		(ref
+			(	$Sender->MailMsg(
+						{
+							to => $To, 
+							subject => $Subject,
+							msg => $Message
+						}
+					)
+			)
+		)||&CGIError("Couldn't send the email by SMTP server<br>\n SMTP Path: $SendMailLocation<br>\nReason : $Mail::Sender::Error");
+		$Sender->Close();
+	}elsif ($EmailFunction eq "SendMail") {
+		open (MAIL, "|$SendMailLocation -t") || &CGIError("Couldn't open the SendMail program<br>\nPath: $SendMailLocation<br>\nReason : $!");
+			print MAIL "To: $To\n";
+			print MAIL "From: $From\n";
+			print MAIL "Subject: $Subject\n\n";
+			print MAIL "$Message\n\n";
+		close (MAIL);
+	}
+}
+
+###############################################################################
+# SaveMemberData                                                              #
+###############################################################################
+sub SaveMemberData {
+	my ($ID,@Input)=@_;
+	$ID=lc($ID);
+	my ($Temp, $Return);
+	@Input=&DecodeHTML(@Input);
+	$Input[15]=&DecodeUBCodes($Input[15]);
+	$tmp=&EncodeUBCodes($Input[15]);
+	@Input=&EncodeHTML(@Input);
+	$Input[15]=$tmp;
+	for (my ($i)=0;$i<=$#Input;$i++) {
+		$Input[$i] =~ s/\r//g;
+	}
+	$Return = join ("\n",@Input);
+	open(INFO,">$MembersPath/$ID.info")||&CGIError("Couldn't create/write the $ID.info file<br>\nPath: $MembersPath<br>\nReason : $!");
+		flock(INFO,2) if ($FLock);
+			print INFO $Return;
+		flock(INFO,8) if ($FLock);
+	close(INFO);
+}
+
+###############################################################################
+# GetMemberData                                                               #
+###############################################################################
+sub GetMemberData {
+	my ($ID)=@_;
+	$ID=lc($ID);
+	open(INFO,"$MembersPath/$ID.info")||&CGIError("Couldn't open/read the $ID.info file<br>\nPath: $MembersPath<br>\nReason : $!");
+		flock(INFO,1) if ($FLock);
+		my (@INFO_DATA)=<INFO>;
+	close(INFO);
+	for (my ($i)=0;$i<=$#INFO_DATA;$i++) {
+		chomp ($INFO_DATA[$i]);
+		$INFO_DATA[$i]=~s/\\n/\n/g;
+	}
+	@INFO_DATA=&DecodeHTML(@INFO_DATA);
+	return @INFO_DATA;
+}
+
+###############################################################################
+# ChangesChars                                                                #
+###############################################################################
+sub ChangesChars {
+    my (@Chars) = @_;
+	for (my($i)=0;$i<=$#Chars;$i++){
+        $Chars[$i]  =~ s/\"/\\\"/g;
+        $Chars[$i]  =~ s/\n\n/\<p\>\\n\\n/g;
+        $Chars[$i]  =~ s/\n/\<br\>\\\n/g;
+        $Chars[$i]  =~ s/\@/\\\@/g;
+        $Chars[$i]  =~ s/^\s+//g;
+        $Chars[$i]  =~ s/\s+$//g;
+	}
+	return wantarray ? @Chars : $Chars[0];
+}
+
+###############################################################################
+# EncodeHTML                                                                  #
+###############################################################################
+sub EncodeHTML {
+	my (@Encode) = @_;
+	for (my($i)=0;$i<=$#Encode;$i++){
+		$Encode[$i] =~ s/\</\&lt\;/g;
+		$Encode[$i] =~ s/\>/\&gt\;/g;
+		$Encode[$i] =~ s/\"/\&quot\;/g;
+		$Encode[$i] =~ s/\'/\|APO\|/g;
+		$Encode[$i] =~ s/\+/\|PLS\|/g;
+		$Encode[$i] =~ s/\=/\|EQU\|/g;
+		$Encode[$i] =~ s/\n\n/\<p\>\\n\\n/g;
+		$Encode[$i] =~ s/\n/\<br\>\\n/g;
+		$Encode[$i] =~ s/\s/\+/g;
+		$Encode[$i] =~ s/\&/\&amp\;/g;
+	}
+	return wantarray ? @Encode : $Encode[0];
+}
+
+###############################################################################
+# DecodeHTML                                                                  #
+###############################################################################
+sub DecodeHTML {
+	my (@Decode) = @_;
+	for (my($i)=0;$i<=$#Decode;$i++){
+		$Decode[$i] =~ s/\&amp\;/\&/g;
+		$Decode[$i] =~ s/\+/ /g;
+		$Decode[$i] =~ s/\|EQU\|/\=/g;
+		$Decode[$i] =~ s/\|PLS\|/\+/g;
+		$Decode[$i] =~ s/\|APO\|/\'/g;
+		$Decode[$i] =~ s/\&quot\;/\"/g;
+		$Decode[$i]=~s/\\n/\n/g;
+	}
+	return wantarray ? @Decode : $Decode[0];
+}
+
+###############################################################################
+# EncodeUBCodes                                                               #
+###############################################################################
+sub EncodeUBCodes {
+	$_ = shift;
+	
+	$_ =~ s/\</\&lt\;/g;
+	$_ =~ s/\>/\&gt\;/g;
+	
+	if ($UBCodes eq "on") {
+		$_ =~ s/\\\\/\\<!--no-->/isg;
+		$_ =~ s/\\\[/\[<!--no-->/isg;
+		$_ =~ s/\\\]/<!--no-->\]/isg;
+		$_ =~ s/\\\:/\:<!--no-->/isg;
+		$_ =~ s/\\\;/\;<!--no-->/isg;
+        $_ =~ s/\\\^/\;<!--no-->/isg;
+
+		$_ =~ s/\\http:\/\/(\S+)/<a href=\"http:\/\/$1\"\ target=\"_blank\"><!--auto-->http:\/\/$1<\/a><!--auto-->/isg;
+
+		$_ =~ s/\\(www.\S+)/<a href=\"http:\/\/$1\"\ target=\"_blank\"><!--autohttp-->http:\/\/$1<\/a><!--autohttp-->/isg;
+
+		$_ =~ s/\\ftp:\/\/(\S+)/<a href=\"ftp:\/\/$1\"\ target=\"_blank\"><!--auto-->ftp:\/\/$1<\/a><!--auto-->/isg;
+
+		$_ =~ s/\\(ftp.\S+)/<a href=\"ftp:\/\/$1\"\ target=\"_blank\"><!--autoftp-->ftp:\/\/$1<\/a><!--autoftp-->/isg;
+
+		$_ =~ s/\\(\S+?)\@(\S+)/<a href=\"mailto:$1\@$2\"\><!--autoemail-->$1\@$2<\/a><!--autoemail-->/ig;
+
+		$_ =~ s/\[img=(\S+?)\]/<img src=\"$1\" border=\"0\">/isg;
+
+		$_ =~ s/\[url=http:\/\/(\S+?)\]/<!--http--><a href=\"http:\/\/$1\"\ target=\"_blank\">/isg;
+		$_ =~ s/\[url=(\S+?)\]/<!--nohttp--><a href=\"http:\/\/$1\"\ target=\"_blank\">/isg;
+		$_ =~ s/\[\/url\]/<\/a><!--url-->/isg;
+
+		$_ =~ s/\[email=(\S+?)\]/<a href=\"mailto:$1\">/isg;
+		$_ =~ s/\[\/email\]/<\/a><!--email-->/isg;
+
+		$_ =~ s/\[b\]/<b>/isg;
+		$_ =~ s/\[\/b\]/<\/b>/isg;
+
+		$_ =~ s/\[i\]/<i>/isg;
+		$_ =~ s/\[\/i\]/<\/i>/isg;
+
+		$_ =~ s/\[u\]/<u>/isg;
+		$_ =~ s/\[\/u\]/<\/u>/isg;
+
+		$_ =~ s/\[1\]/<font size=\"1\">/isg;
+		$_ =~ s/\[\/1\]/<\/font><!--1-->/isg;
+
+		$_ =~ s/\[2\]/<font size=\"2\">/isg;
+		$_ =~ s/\[\/2\]/<\/font><!--2-->/isg;
+
+		$_ =~ s/\[3\]/<font size=\"3\">/isg;
+		$_ =~ s/\[\/3\]/<\/font><!--3-->/isg;
+
+		$_ =~ s/\[4\]/<font size=\"4\">/isg;
+		$_ =~ s/\[\/4\]/<\/font><!--4-->/isg;
+
+		$_ =~ s/\[fixed\]/<font face=\"Courier New\">/isg;
+		$_ =~ s/\[\/fixed\]/<\/font><!--fixed-->/isg;
+
+		$_ =~ s/\[sup\]/<sup>/isg;
+		$_ =~ s/\[\/sup\]/<\/sup>/isg;
+
+		$_ =~ s/\[sub\]/<sub>/isg;
+		$_ =~ s/\[\/sub\]/<\/sub>/isg;
+
+		$_ =~ s/\[center\]/<center>/isg;
+		$_ =~ s/\[\/center\]/<\/center>/isg;
+
+		$_ =~ s/\[color=(\S+?)\]/<font color=\"$1\">/isg;
+		$_ =~ s/\[\/color\]/<\/font><!--color-->/isg;
+
+		$_ =~ s/\[list\]/<li>/isg;
+
+		$_ =~ s/\[pre\]/<pre>/isg;
+		$_ =~ s/\[\/pre\]/<\/pre>/isg;
+
+		#$_ =~ s/\[code\](.+?)\[\/code\]/<blockquote><font size=\"1\" face=\"$FontFace\">code:<\/font><hr><font face=\"Courier New\"><pre>$1<\/pre><\/font><hr><\/blockquote>/isg;
+		
+		#$_ =~ s/\[quote\]<br>(.+?)<br>\[\/quote\]/<blockquote><hr>$1<hr><\/blockquote>/isg;
+		#$_ =~ s/\[quote\](.+?)\[\/quote\]/<blockquote><hr>$1<hr><\/blockquote>/isg;
+
+		$_ =~ s/\:\-\)/<img src=\"$URLImages\/Happy.gif\" border=\"0\" align=\"middle\">/isg;
+		$_ =~ s/\;\-\)/<img src=\"$URLImages\/Wilk.gif\" border=\"0\" align=\"middle\">/isg;
+		$_ =~ s/\:\-\(/<img src=\"$URLImages\/Sad.gif\" border=\"0\" align=\"middle\">/isg;
+		$_ =~ s/\:\-D/<img src=\"$URLImages\/TooHappy.gif\" border=\"0\" align=\"middle\">/isg;
+
+        $_ =~ s/\:\)/$imgEmotion_1<!--e1-->/isg     if ($imgEmotion_1);
+        $_ =~ s/\:\(/$imgEmotion_2<!--e2-->/isg     if ($imgEmotion_2);
+        $_ =~ s/\;\)/$imgEmotion_3<!--e3-->/isg     if ($imgEmotion_3);
+        $_ =~ s/\:P/$imgEmotion_4<!--e4-->/isg      if ($imgEmotion_4);
+        $_ =~ s/\;P/$imgEmotion_5<!--e5-->/isg      if ($imgEmotion_5);
+        $_ =~ s/\:o\)/$imgEmotion_7<!--e7-->/isg    if ($imgEmotion_7);
+        $_ =~ s/\:o/$imgEmotion_6<!--e6-->/isg      if ($imgEmotion_6);
+        $_ =~ s/\^\_\^/$imgEmotion_8<!--e8-->/isg   if ($imgEmotion_8);
+        $_ =~ s/\^\^\;/$imgEmotion_9<!--e9-->/isg   if ($imgEmotion_9);
+        $_ =~ s/\^\^/$imgEmotion_10<!--e10-->/isg   if ($imgEmotion_10);
+
+        $_ =~ s/8\-\)/$imgEmotion_11<!--e11-->/isg  if ($imgEmotion_11);
+        $_ =~ s/8\)/$imgEmotion_12<!--e12-->/isg    if ($imgEmotion_12);
+        $_ =~ s/\:D/$imgEmotion_13<!--e13-->/isg    if ($imgEmotion_13);
+
+		$_ =~ s/\\c/\&copy\;<!--char-->/g;
+		$_ =~ s/\\r/\&reg\;<!--char-->/g;
+		$_ =~ s/\\tm/\&\#153\;<!--char-->/g;
+	}
+	$_ =~ s/\n\n/\<p\>\\n\\n/g;
+	$_ =~ s/\n/\<br\>\\n/g;
+	if ($UBCodes eq "on") {
+		$_ =~ s/\[quote\]<br>(.+?)<br>\[\/quote\]/<blockquote><hr>$1<hr><\/blockquote>/isg;
+		$_ =~ s/\[quote\]<br>(.+?)\[\/quote\]/<blockquote><hr>$1<hr><\/blockquote>/isg;
+		$_ =~ s/\[quote\](.+?)<br>\[\/quote\]/<blockquote><hr>$1<hr><\/blockquote>/isg;
+		$_ =~ s/\[quote\](.+?)\[\/quote\]/<blockquote><hr>$1<hr><\/blockquote>/isg;
+
+		$_=~s/\[code\](.+?)\[\/code\]/<blockquote><pre><font size=\"1\" face=\"$FontFace\">code:<\/font><hr><font face=\"Courier New\" size=\"$TextSize\">$\{(&StripBRP($1))}<\/font><hr><\/pre><\/blockquote>/isg;
+
+		$_=~s/\[pre\](.+?)\[\/pre\]/<pre>$\{(&StripBRP($1))}<\/pre>/isg;
+	}
+	$_ =~ s/\"/\&quot\;/g;
+	$_ =~ s/\'/\|APO\|/g;
+	$_ =~ s/\+/\|PLS\|/g;
+	$_ =~ s/\=/\|EQU\|/g;
+	$_ =~ s/\s/\+/g;
+	$_ =~ s/\&/\&amp\;/g;
+	return $_;
+}
+
+###############################################################################
+# StripBRP                                                                    #
+###############################################################################
+sub StripBRP {
+	$_ = shift;
+	$_ =~ s/<br>//isg;
+	$_ =~ s/<p>//isg;
+	return $_;
+}
+
+###############################################################################
+# DecodeUBCodes                                                               #
+###############################################################################
+sub DecodeUBCodes {
+	$_ = shift;
+
+	$_ =~ s/\&copy\;<!--char-->/\\c/g;
+	$_ =~ s/\&reg\;<!--char-->/\\r/g;
+	$_ =~ s/\&\#153\;<!--char-->/\\tm/g;
+
+    $_ =~ s/$imgEmotion_13<!--e13-->/\:D/isg        if ($imgEmotion_13);
+    $_ =~ s/$imgEmotion_12<!--e12-->/8\)/isg       if ($imgEmotion_12);
+    $_ =~ s/$imgEmotion_11<!--e11-->/8\-\)/isg     if ($imgEmotion_11);
+
+    $_ =~ s/$imgEmotion_10<!--e10-->/\^\^/isg       if ($imgEmotion_10);
+    $_ =~ s/$imgEmotion_9<!--e9-->/\^\^\;/isg       if ($imgEmotion_9);
+    $_ =~ s/$imgEmotion_8<!--e8-->/\^\_\^/isg       if ($imgEmotion_8);
+    $_ =~ s/$imgEmotion_6<!--e6-->/\:o/isg          if ($imgEmotion_6);
+    $_ =~ s/$imgEmotion_7<!--e7-->/\:o\)/isg        if ($imgEmotion_7);
+    $_ =~ s/$imgEmotion_5<!--e5-->/\;P/isg          if ($imgEmotion_5);
+    $_ =~ s/$imgEmotion_4<!--e4-->/\:P/isg          if ($imgEmotion_4);
+    $_ =~ s/$imgEmotion_3<!--e3-->/\;\)/isg         if ($imgEmotion_3);
+    $_ =~ s/$imgEmotion_2<!--e2-->/\:\(/isg         if ($imgEmotion_2);
+    $_ =~ s/$imgEmotion_1<!--e1-->/\:\)/isg         if ($imgEmotion_1);
+
+	$_ =~ s/<img src=\"$URLImages\/TooHappy.gif\" border=\"0\" align=\"middle\">/\:\-D/isg;
+	$_ =~ s/<img src=\"$URLImages\/Sad.gif\" border=\"0\" align=\"middle\">/\:\-\(/isg;
+	$_ =~ s/<img src=\"$URLImages\/Wilk.gif\" border=\"0\" align=\"middle\">/\;\-\)/isg;
+	$_ =~ s/<img src=\"$URLImages\/Happy.gif\" border=\"0\" align=\"middle\">/\:\-\)/isg;
+
+	$_ =~ s/<blockquote><hr>(.+?)<hr><\/blockquote>/\[quote\]$1\[\/quote\]/isg;
+
+	$_ =~ s/<blockquote><pre><font size=\"1\" face=\"$FontFace\">code:<\/font><hr><font face=\"Courier New\" size=\"\S+\">(.+?)<\/font><hr><\/pre><\/blockquote>/\[code\]$1\[\/code\]/isg;
+	
+	$_ =~ s/<\/pre>/\[\/pre\]/isg;
+	$_ =~ s/<pre>/\[pre\]/isg;
+
+	$_ =~ s/<li>/\[list\]/isg;
+
+	$_ =~ s/<\/font><!--color-->/\[\/color\]/isg;
+	$_ =~ s/<font color=\"(\S+?)\">/\[color=$1\]/isg;
+
+	$_ =~ s/<\/center>/\[\/center\]/isg;
+	$_ =~ s/<center>/\[center\]/isg;
+	
+	$_ =~ s/<\/sub>/\[\/sub\]/isg;
+	$_ =~ s/<sub>/\[sub\]/isg;
+
+	$_ =~ s/<\/sup>/\[\/sup\]/isg;
+	$_ =~ s/<sup>/\[sup\]/isg;
+
+	$_ =~ s/<\/font><!--fixed-->/\[\/fixed\]/isg;
+	$_ =~ s/<font face=\"Courier New\">/\[fixed\]/isg;
+
+	$_ =~ s/<\/font><!--4-->/\[\/4\]/isg;
+	$_ =~ s/<font size=\"4\">/\[4\]/isg;
+
+	$_ =~ s/<\/font><!--3-->/\[\/3\]/isg;
+	$_ =~ s/<font size=\"3\">/\[3\]/isg;
+
+	$_ =~ s/<\/font><!--2-->/\[\/2\]/isg;
+	$_ =~ s/<font size=\"2\">/\[2\]/isg;
+
+	$_ =~ s/<\/font><!--1-->/\[\/1\]/isg;
+	$_ =~ s/<font size=\"1\">/\[1\]/isg;
+
+	$_ =~ s/<\/u>/\[\/u\]/isg;
+	$_ =~ s/<u>/\[u\]/isg;
+
+	$_ =~ s/<\/i>/\[\/i\]/isg;
+	$_ =~ s/<i>/\[i\]/isg;
+
+	$_ =~ s/<\/b>/\[\/b\]/isg;
+	$_ =~ s/<b>/\[b\]/isg;
+
+	$_ =~ s/<a href=\"mailto:(\S+?)\"><!--autoemail-->\S+<\/a><!--autoemail-->/\\$1/isg;
+		
+	$_ =~ s/<a href=\"ftp:\/\/(\S+?)\" target=\"_blank\"><!--autoftp-->\S+<\/a><!--autoftp-->/\\$1/isg;
+
+	$_ =~ s/<a href=\"(ftp:\/\/\S+?)\" target=\"_blank\"><!--auto-->\S+<\/a><!--auto-->/\\$1/isg;	
+	
+	$_ =~ s/<a href=\"http:\/\/(\S+?)\" target=\"_blank\"><!--autohttp-->\S+<\/a><!--autohttp-->/\\$1/isg;
+
+	$_ =~ s/<a href=\"(http:\/\/\S+?)\" target=\"_blank\"><!--auto-->\S+<\/a><!--auto-->/\\$1/isg;
+	
+	$_ =~ s/<\/a><!--email-->/\[\/email\]/isg;
+	$_ =~ s/<a href=\"mailto:(\S+?)\">/\[email=$1\]/isg;
+
+	$_ =~ s/<\/a><!--url-->/\[\/url\]/isg;
+	$_ =~ s/<!--nohttp--><a href=\"http:\/\/(\S+?)\" target=\"_blank\">/\[url=$1\]/isg;
+	$_ =~ s/<!--http--><a href=\"(http:\/\/\S+?)\" target=\"_blank\">/\[url=$1\]/isg;
+
+	$_ =~ s/<img src=\"(\S+?)\" border=\"0\">/\[img=$1\]/isg;
+
+    $_ =~ s/\;<!--no-->/\\\^/isg;
+	$_ =~ s/\;<!--no-->/\\\;/isg;
+	$_ =~ s/\:<!--no-->/\\\:/isg;
+	$_ =~ s/<!--no-->\]/\\\]/isg;
+	$_ =~ s/\[<!--no-->/\\\[/isg;
+	$_ =~ s/\\<!--no-->/\\\\/isg;
+	
+	$_ =~ s/\<p\>//isg;
+	$_ =~ s/\<br\>//isg;
+	$_ =~ s/\&lt\;/\</isg;
+	$_ =~ s/\&gt\;/\>/isg;
+
+	return $_;
+}
+
+###############################################################################
+# RemoveUBCodes                                                               #
+###############################################################################
+sub RemoveUBCodes {
+	$_ = shift;
+
+	$_ =~ s/\&copy\;<!--char-->/\(c\)/g;
+	$_ =~ s/\&reg\;<!--char-->/(r)/g;
+	$_ =~ s/\&\#153\;<!--char-->/(tm)/g;
+
+    $_ =~ s/$imgEmotion_13<!--e13-->/\:D/isg       if ($imgEmotion_13);
+    $_ =~ s/$imgEmotion_12<!--e12-->/8\)/isg       if ($imgEmotion_12);
+    $_ =~ s/$imgEmotion_11<!--e11-->/8\-\)/isg     if ($imgEmotion_11);
+
+    $_ =~ s/$imgEmotion_10<!--e10-->/\^\^/isg       if ($imgEmotion_10);
+    $_ =~ s/$imgEmotion_9<!--e9-->/\^\^\;/isg       if ($imgEmotion_9);
+    $_ =~ s/$imgEmotion_8<!--e8-->/\^\_\^/isg       if ($imgEmotion_8);
+    $_ =~ s/$imgEmotion_6<!--e6-->/\:o/isg         if ($imgEmotion_6);
+    $_ =~ s/$imgEmotion_7<!--e7-->/\:o\)/isg       if ($imgEmotion_7);
+    $_ =~ s/$imgEmotion_5<!--e5-->/\;P/isg         if ($imgEmotion_5);
+    $_ =~ s/$imgEmotion_4<!--e4-->/\:P/isg         if ($imgEmotion_4);
+    $_ =~ s/$imgEmotion_3<!--e3-->/\;\)/isg         if ($imgEmotion_3);
+    $_ =~ s/$imgEmotion_2<!--e2-->/\:\(/isg         if ($imgEmotion_2);
+    $_ =~ s/$imgEmotion_1<!--e1-->/\:\)/isg         if ($imgEmotion_1);
+
+	$_ =~ s/<img src=\"$URLImages\/TooHappy.gif\" border=\"0\" align=\"middle\">/\:\-D/isg;
+	$_ =~ s/<img src=\"$URLImages\/Sad.gif\" border=\"0\" align=\"middle\">/\:\-\(/isg;
+	$_ =~ s/<img src=\"$URLImages\/Wilk.gif\" border=\"0\" align=\"middle\">/\;\-\)/isg;
+	$_ =~ s/<img src=\"$URLImages\/Happy.gif\" border=\"0\" align=\"middle\">/\:\-\)/isg;
+
+	$_ =~ s/<blockquote><hr>(.+?)<hr><\/blockquote>/\n\{\n$1\n}\n/isg;
+
+	$_ =~ s/<blockquote><pre><font size=\"1\" face=\"$FontFace\">code:<\/font><hr><font face=\"Courier New\" size=\"\S+\">(.+?)<\/font><hr><\/pre><\/blockquote>/\ncode\:\{\n$1\n}\n/isg;
+	
+	$_ =~ s/<\/pre>//isg;
+	$_ =~ s/<pre>//isg;
+
+	$_ =~ s/<li>/- /isg;
+
+	$_ =~ s/<\/font><!--color-->//isg;
+	$_ =~ s/<font color=\"(\S+?)\">//isg;
+
+	$_ =~ s/<\/center>//isg;
+	$_ =~ s/<center>//isg;
+	
+	$_ =~ s/<\/sub>//isg;
+	$_ =~ s/<sub>//isg;
+
+	$_ =~ s/<\/sup>//isg;
+	$_ =~ s/<sup>//isg;
+
+	$_ =~ s/<\/font><!--fixed-->//isg;
+	$_ =~ s/<font face=\"Courier New\">//isg;
+
+	$_ =~ s/<\/font><!--4-->//isg;
+	$_ =~ s/<font size=\"4\">//isg;
+
+	$_ =~ s/<\/font><!--3-->//isg;
+	$_ =~ s/<font size=\"3\">//isg;
+
+	$_ =~ s/<\/font><!--2-->//isg;
+	$_ =~ s/<font size=\"2\">//isg;
+
+	$_ =~ s/<\/font><!--1-->//isg;
+	$_ =~ s/<font size=\"1\">//isg;
+
+	$_ =~ s/<\/u>//isg;
+	$_ =~ s/<u>//isg;
+
+	$_ =~ s/<\/i>//isg;
+	$_ =~ s/<i>//isg;
+
+	$_ =~ s/<\/b>//isg;
+	$_ =~ s/<b>//isg;
+
+	$_ =~ s/<a href=\"mailto:(\S+?)\"><!--autoemail-->\S+<\/a><!--autoemail-->/$1/isg;
+		
+	$_ =~ s/<a href=\"ftp:\/\/(\S+?)\" target=\"_blank\"><!--autoftp-->\S+<\/a><!--autoftp-->/$1/isg;
+
+	$_ =~ s/<a href=\"(ftp:\/\/\S+?)\" target=\"_blank\"><!--auto-->\S+<\/a><!--auto-->/$1/isg;	
+	
+	$_ =~ s/<a href=\"http:\/\/(\S+?)\" target=\"_blank\"><!--autohttp-->\S+<\/a><!--autohttp-->/$1/isg;
+
+	$_ =~ s/<a href=\"(http:\/\/\S+?)\" target=\"_blank\"><!--auto-->\S+<\/a><!--auto-->/$1/isg;
+	
+	$_ =~ s/<\/a><!--email-->//isg;
+	$_ =~ s/<a href=\"mailto:(\S+?)\">//isg;
+
+	$_ =~ s/<\/a><!--url-->//isg;
+	$_ =~ s/<!--nohttp--><a href=\"http:\/\/(\S+?)\" target=\"_blank\">//isg;
+	$_ =~ s/<!--http--><a href=\"(http:\/\/\S+?)\" target=\"_blank\">//isg;
+
+	$_ =~ s/<img src=\"(\S+?)\" border=\"0\">/[image]/isg;
+
+    $_ =~ s/\;<!--no-->/\\\^/isg;
+	$_ =~ s/\;<!--no-->/\\\;/isg;
+	$_ =~ s/\:<!--no-->/\\\:/isg;
+	$_ =~ s/<!--no-->\]/\\\]/isg;
+	$_ =~ s/\[<!--no-->/\\\[/isg;
+	$_ =~ s/\\<!--no-->/\\\\/isg;
+
+	$_ =~ s/\<p\>//isg;
+	$_ =~ s/\<br\>//isg;
+	$_ =~ s/\&lt\;/\</isg;
+	$_ =~ s/\&gt\;/\>/isg;
+
+	return $_;
+}
+
+###############################################################################
+# EncodeDBInput                                                               #
+###############################################################################
+sub EncodeDBInput {
+	my (@Input) = @_;
+	my ($Temp, $Return);
+	@Input=&EncodeHTML(@Input);
+	for (@Input) {
+		$Temp = $_;
+		$Temp =~ s/\Q$Spliter\E/\|\&\^\&\|/g;
+		$Temp =~ s/\r//g;
+		$Return .= $Temp.$Spliter;
+	}
+	$Return =~ s/\Q$Spliter\E$//g;
+	$Return .= "\n";
+	return $Return;
+}
+
+###############################################################################
+# DecodeDBOutput                                                              #
+###############################################################################
+sub DecodeDBOutput {
+	my ($Output) = @_;
+	my (@Outputs);
+	chomp ($Output);
+	@Outputs=split(/\Q$Spliter\E/, $Output);
+	for (my($i)=0;$i<=$#Outputs;$i++){
+		$Outputs[$i]=~s/\|\&\^\&\|/$Spliter/g;
+	}
+	@Outputs=&DecodeHTML(@Outputs);
+	return wantarray ? @Outputs : $Outputs[0];
+}
+
+###############################################################################
+# RandomPassword                                                              #
+###############################################################################
+sub RandomPassword {
+	my @Chars = (
+		"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
+		"n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+
+		"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", 
+		"N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+
+		"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"
+	);
+	my $Password;
+	srand(time);
+	for (my ($i)=0;$i<6;$i++) {
+		$Password.=$Chars[rand(@Chars)];
+	}
+	return $Password; 
+}
+
+###############################################################################
+# RemoveCensorWords                                                           #
+###############################################################################
+sub RemoveCensorWords {
+	my ($Input) = @_;
+	my ($TempWord);
+	if ($CensorWords) {
+		@CensorWords=split(/ /,$CensorWords);
+		for (@CensorWords) {
+			if ($Input =~/$_/i) {
+				$TempWord="#" x length($_);
+				$Input=~s/$_/$TempWord/ig;
+			}
+		}
+	}
+	return $Input;
+}
+
+###############################################################################
+# GetDate                                                                     #
+###############################################################################
+sub GetDate {
+	@Months = ("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Des");
+	if (@_[0] eq "N/A" or @_[0] eq "") {
+		return @_[0];
+	}
+	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = gmtime($_[0]+($GMTOffset*3600));
+	my ($DateColor,$TimeColor,$DateSize,$TimeSize)=($_[1],$_[2],$_[3],$_[4]);
+    my ($DateFont, $CDateFont, $TimeFont, $CTimeFont);
+    if ($DateColor and $DateSize) {
+        $DateFont .= &Font("",$DateSize,$DateColor);
+        $CDateFont = "</font>";
+    }
+    if ($TimeColor and $TimeSize) {
+        $TimeFont = &Font("",$TimeSize,$TimeColor);
+        $CTimeFont = "</font>";
+    }
+	my ($Full);
+	#if ($year>80) {
+		$year += 1900;
+	#}else{
+	#	$year += 2000;
+	#}
+	$mon++;
+	if ($mon < 10) {
+		$mon = "0$mon";
+	}
+	if ($mday < 10) {
+		$mday = "0$mday";
+	}
+	if ($DateFormat eq "US") {
+		$Full = $DateFont."$mon-$mday-$year".$CDateFont;
+	}elsif ($DateFormat eq "USE") {
+		$Full = $DateFont.@Months[$mon-1]." $mday, $year".$CDateFont;
+	}elsif ($DateFormat eq "EU") {
+		$Full = $DateFont."$mday-$mon-$year".$CDateFont;
+	}elsif ($DateFormat eq "EUE") {
+		$Full = $DateFont."$mday ".@Months[$mon-1].", $year".$CDateFont;
+	}
+	if ($sec < 10) {
+		$sec = "0$sec";
+	}
+	if ($min < 10) {
+		$min = "0$min";
+	}
+	if ($TimeFormat eq "12") {
+		if ($hour > 11) {
+			if ($hour > 12) {
+				$hour = $hour-12;
+			}
+			if ($hour < 10) {
+				$hour = "0$hour";
+			}
+			$Full .= $TimeFont." $hour\:$min\:$sec P.M.".$CTimeFont;
+		}else{
+			if ($hour < 10) {
+				$hour = "0$hour";
+			}
+			$Full .= $TimeFont." $hour\:$min\:$sec A.M.".$CTimeFont;
+		}
+	}elsif ($TimeFormat eq "24") {
+		if ($hour < 10) {
+			$hour = "0$hour";
+		}
+		$Full .= $TimeFont." $hour\:$min\:$sec".$CTimeFont;
+	}
+	return $Full;
+}
+
+###############################################################################
+# PrintVersion                                                                #
+###############################################################################
+sub PrintVersion {
+	my ($TimeZone) = @_;
+	if ($TimeZone) {
+		return	&Table("100%","","0","0","","").
+					&Tr("","","").
+						&Td("","","","","","","","","").
+							&Font($FontFace,$MenuTextSize,$MenuTextColor)."All times are ".$TimeZoneName."</font>".
+						"</td>".
+						&Td("","","","","RIGHT","","","","").
+							&Font($FontFace,$MenuTextSize,$MenuTextColor).
+								"Powered by ".
+								&Link("http://www.UltraScripts.com/","_blank","Powered by UltraBoard v1.62").
+									"UltraBoard v1.62".
+								"</a>".
+							"</font>".
+						"</td>".
+					"</tr>".
+				"</table>";
+				
+	}else{
+		return	&Table("100%","","0","0","","").
+					&Tr("","","").
+						&Td("","","","","RIGHT","","","","").
+							&Font($FontFace,$MenuTextSize,$MenuTextColor).
+								"Powered by ".
+								&Link("http://www.UltraScripts.com/","_blank","Powered by UltraBoard v1.62").
+									"UltraBoard v1.62".
+								"</a>".
+							"</font>".
+						"</td>".
+					"</tr>".
+				"</table>";
+	}
+}
+
+###############################################################################
+# PrintTheme                                                                  #
+###############################################################################
+sub PrintTheme {
+	my ($Title, $HTML, $Second, $Redirect)=@_;
+	print &HTMLHeader();
+	open(THEME,"$VarsPath/UltraBoard.them")||&CGIError("Couldn't open/read the UltraBoard.them file<br>\nPath: $VarsPath<br>\nReason : $!");
+		flock(THEME,1) if ($FLock);
+		while (<THEME>) {
+			if ($_ =~/\<:UltraBoardTitle:\>/i) {
+				$_=~s/\<:UltraBoardTitle:\>/$Title/ig;
+			}
+			if ($_ =~/\<:UltraBoardRedirect:\>/i) {
+				if ($Redirect) {
+					$Redirect="<meta http-equiv=\"REFRESH\" content=\"$Second; url=$Redirect\">";
+				}			
+				$_=~s/\<:UltraBoardRedirect:\>/$Redirect/ig;
+			}
+			if ($_=~/\<:TableWidth:\>/i) {
+				$_=~s/\<:TableWidth:\>/$TableWidth/ig;
+			}
+			if ($_=~/\<:TableBorderColor:\>/i) {
+				$_=~s/\<:TableBorderColor:\>/$TableBorderColor/ig;
+			}
+			if ($_=~/\<:TableAlign:\>/i) {
+				$_=~s/\<:TableAlign:\>/$TableAlign/ig;
+			}
+			if ($_=~/\<:TableCellSpacing:\>/i) {
+				$_=~s/\<:TableCellSpacing:\>/$TableCellSpacing/ig;
+			}
+			if ($_=~/\<:TableCellPadding:\>/i) {
+				$_=~s/\<:TableCellPadding:\>/$TableCellPadding/ig;
+			}
+			if ($_=~/\<:UltraBoardName:\>/i) {
+				$_=~s/\<:UltraBoardName:\>/$UBName/ig;
+			}
+			if ($_=~/\<:UltraBoardDescription:\>/i) {
+				$_=~s/\<:UltraBoardDescription:\>/$UBDes/ig;
+			}
+			if ($_=~/\<:MenuBGColor:\>/i) {
+				$_=~s/\<:MenuBGColor:\>/$MenuBGColor/ig;
+			}
+			if ($_=~/\<:UltraBoardMenu:\>/i) {
+				$Menu=&GetMenu();
+				$_=~s/\<:UltraBoardMenu:\>/$Menu/ig;
+			}
+			if ($_=~/\<:UltraBoardBody:\>/i) {
+				$_=~s/\<:UltraBoardBody:\>/$HTML/ig;
+			}
+			print $_;
+		}
+	close(THEME);
+}
+
+###############################################################################
+# ShowThank                                                                   #
+###############################################################################
+sub ShowThank {
+	my ($Title,$Message,$Second,$Redirect)=@_;
+	$HTML.=	"<p>".&BTable($TableWidth,$TableAlign,"0","0",$TableCellSpacing,$TableCellPadding,$TableBorderColor,"","").
+				&Tr("","",$HeaderBGColor).
+					&Td("","","2","","","","","","").
+						&Font($FontFace,$HeaderTextSize,$HeaderTextColor).
+							"<b>$Title</b>".
+						"</font>".
+					"</td>".
+				"</tr>".
+				&Tr("","",$RowOddBGColor).
+					&Td("","","2","","","","","","").
+                        &Table("100%","CENTER","10","10","","").
+                            &Tr("","","").
+                                &Td("","","","","","","","","").
+                                    &Font($FontFace,$TextSize,$TextColor).
+                                        $Message.
+                                    "</font>".
+                                "</td>".
+                            "</tr>".
+                        "</table>".
+					"</td>".
+				"</tr>".
+				&Tr("","",$MenuBGColor).
+					&Td("","","2","","","","","","").
+						&PrintVersion().
+					"</td>".
+				"</tr>".
+			&CBTable();
+	&PrintTheme($Title,$HTML,$Second,$Redirect);
+	exit;
+}
+
+###############################################################################
+# ceil                                                                        #
+###############################################################################
+sub ceil {
+	my ($number)=$_[0];
+    my ($int);
+    $int=int($number);
+    if ($number != $int) {
+        return $int+1;
+    }else{
+        return $int;
+    }
+}
+
+###############################################################################
+# CGIError                                                                    #
+###############################################################################
+sub CGIError {
+	my ($Message)=@_;
+	print	&HTMLHeader().
+			&Head("Script Error"). 
+			&Body().
+			"<h1>Script Error</h1>".
+			"<p>".$Message."</p>".
+			&CBody();
+	exit;
+	#die @Message;
+}
+
+###############################################################################
+# ShowError                                                                   #
+###############################################################################
+sub ShowError {
+	my ($Title,$Message)=@_;
+	$HTML.=	"<p>".&BTable($TableWidth,$TableAlign,"0","0",$TableCellSpacing,$TableCellPadding,$TableBorderColor,"","").
+				&Tr("","",$HeaderBGColor).
+					&Td("","","2","","","","","","").
+						&Font($FontFace,$HeaderTextSize,$HeaderTextColor).
+							"<b>$Title</b>".
+						"</font>".
+					"</td>".
+				"</tr>".
+				&Tr("","",$RowOddBGColor).
+					&Td("","","2","","","","","","").
+                        &Table("100%","CENTER","10","10","","").
+                            &Tr("","","").
+                                &Td("","","","","","","","","").
+                                    &Font($FontFace,$TextSize,$TextColor).
+                                        $Message.
+                                    "</font>".
+                                "</td>".
+                            "</tr>".
+                        "</table>".
+					"</td>".
+				"</tr>".
+				&Tr("","",$CategoryBGColor).
+					&Td("","","2","","","","","","").
+						"<center>".&Button("","< BACK","width:$IETextBoxSize","onclick=\"history.go(-1)\"")."</center>".
+					"</td>".
+				"</tr>".
+				&Tr("","",$MenuBGColor).
+					&Td("","","2","","","","","","").
+						&PrintVersion().
+					"</td>".
+				"</tr>".
+			&CBTable();
+	&PrintTheme("$Title",$HTML);
+	exit;
+}
+
+###############################################################################
+# HTTP Cookie Library           Version 2.1                                   #
+# Copyright 1996 Matt Wright    mattw@worldwidemart.com                       #
+# Created 07/14/96              Last Modified 12/23/96                        #
+###############################################################################
+my @Cookie_Encode_Chars = ('\%', '\+', '\;', '\,', '\=', '\&', '\:\:', '\s');
+my %Cookie_Encode_Chars = ('\%',   '%25',
+									'\+',   '%2B',
+									'\;',   '%3B',
+									'\,',   '%2C',
+									'\=',   '%3D',
+									'\&',   '%26',
+									'\:\:', '%3A%3A',
+									'\s',   '+');
+
+my @Cookie_Decode_Chars = ('\+', '\%3A\%3A', '\%26', '\%3D', '\%2C', '\%3B', '\%2B', '\%25');
+my %Cookie_Decode_Chars = ('\+',       ' ',
+									'\%3A\%3A', '::',
+									'\%26',     '&',
+									'\%3D',     '=',
+									'\%2C',     ',',
+									'\%3B',     ';',
+									'\%2B',     '+',
+									'\%25',     '%');
+
+
+###############################################################################
+# GetCookies                                                                  #
+###############################################################################
+sub GetCookies {
+    my ($CookieFlag) = 0;
+    my ($Cookie,$Value,$Char);
+    if ($ENV{'HTTP_COOKIE'}) {
+		foreach (split(/; /,$ENV{'HTTP_COOKIE'})) {
+			($Cookie,$Value) = split(/=/);
+			foreach $Char (@Cookie_Decode_Chars) {
+				$Cookie =~ s/$Char/$Cookie_Decode_Chars{$Char}/g;
+				$Value  =~ s/$Char/$Cookie_Decode_Chars{$Char}/g;
+			}
+			$Cookies{$Cookie} = $Value;
+		}
+		$CookieFlag = 1;
+    }
+    return $CookieFlag;
+}
+
+###############################################################################
+# CookiesHeader                                                               #
+###############################################################################
+sub CookiesHeader {
+	if ($HeaderDefine ne "TRUE") {
+		#my ($Expires, @Cookies) = @_;
+
+		my ($expires, @cookies) = @_;
+		my ($Header);
+		my ($cookie,$value, $chr);
+
+		my (@days) = ("Sun","Mon","Tue","Wed","Thu","Fri","Sat");
+		my (@months) = ("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec");
+
+		my ($sec,$min,$hour,$mDay,$mon,$year,$wDay) = gmtime($expires);
+
+		$sec	= "0".$sec	if ($sec < 10);
+		$min	= "0".$min	if ($min < 10); 
+		$hour = "0".$hour	if ($hour < 10); 
+		
+		if ($expires == -1) { 
+			$expires = "";
+		} else { 
+			$year += 1900; 
+			$expires = "expires\=$days[$wday], $mday-$months[$mon]-$year $hour:$min:$sec GMT;";
+		}
+
+		while(($cookie,$value)=@cookies) {
+			foreach $Char (@Cookie_Encode_Chars) {
+				$cookie =~ s/$Char/$Cookie_Encode_Chars{$Char}/g;
+				$value  =~ s/$Char/$Cookie_Encode_Chars{$Char}/g;
+			}
+			$Header.= "Set-Cookie: $cookie=$value; $expires\n";
+			shift(@cookies);
+			shift(@cookies);
+		}
+		$Header.= "Content-type: text/html\n\n";
+		$HeaderDefine = "TRUE";
+		return $Header;
+	}
+}
+###############################################################################
+1;# End of Common.lib file
+###############################################################################

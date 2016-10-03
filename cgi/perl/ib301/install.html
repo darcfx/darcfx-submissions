@@ -1,0 +1,269 @@
+<html>
+<head>
+  <title>Ikonboard 3 installation</title>
+    <style type="text/css">
+    .t  {font-family: Verdana, Arial, Sans-serif;font-size  : 12px;;font-weight: normal;line-height: 150%;color : #000000;}
+	.l  {font-family: Arial, Sans-serif;font-size  : 18px;font-weight: normal;line-height: 150%;color : #333366;}
+	.s  {font-family: Arial, Sans-serif;font-size  : 14px;font-weight: bold;line-height: 150%;color : #000099;}
+	.b  {font-family: Arial, Sans-serif;font-size  : 14px;font-weight: bold;line-height: 150%;color : #990000;}
+    .bt {font-family: Verdana, Arial, Sans-serif;font-size  : 11px; font-weight: normal; color : #000033;}
+	</style>
+</head>
+<body bgcolor='#FFFFFF' topmargin='0' leftmargin='0'>
+
+<table width='90%' align='center' cellspacing='0' cellpadding='4'>
+<tr>
+ <td>
+	<span class='l'><span style='color:red'>&gt;</span> Ikonboard 3 Installation Guide</span>
+	<hr noshade size='1' color='#000000'>
+	<span class='t'>Welcome to the Ikonboard installation guide.
+	  <br>This guide will walk you through the Ikonboard installation procedure and get you started with your board.
+	</span>
+ </td>
+</tr>
+<tr>
+ <td>
+    <table border='0' width='100%' style='border:1px thin black' height='100%'>
+	 <tr>
+		<td class='t'>
+         <span class='s'><span style='color:red'>&gt;</span> Install Guide Key</span>
+         <br>
+         <span class='b'><span style='color:red'>?</span> Jargon Buster</span>: A 'dictonary' of terms that may be new to you.
+         <br>
+         <span class='b'><span style='color:red'>!</span> Windows / NT Tips</span>: Special instructions for Windows/NT servers.
+         <br>
+         <span style='color:red'>Red text </span>: Means that the filename used is a directory.
+         <br>
+         <span style='color:blue'>Blue text</span>: Means that the filename used is a file.
+        </td>
+      </tr>
+     </table>
+  </td>
+</tr>
+<tr>
+ <td class='t'>
+    <br>
+	<span class='s'><span style='color:red'>&gt;</span> Getting Started</span>
+	<br><br>
+	<span class='t'>Make sure you have the latest Ikonboard version available already downloaded.
+	<br>Unzip the download package with your favourite <i>unzip</i> program. Ensure that the filenames are kept intact
+	during the unzip process. If you end up with file names like: <i>IKONB~1.cgi</i>, you'll need to edit your unzip
+	programs preferences to preserve the original filenames.
+	<br>Take a moment to familiarise yourself with the files. Open the directory called 'iB3_UPLOAD', it should contain the following:
+	</span>
+ </td>
+</tr>
+
+<!-- start tables -->
+
+<tr>
+ <td valign='top'>
+	<table border='0' width='100%' align='center'>
+	<tr>
+	  <td width='30%' valign='top'>
+		<table border='0' width='100%' style='border:1px thin black' height='100%'>
+		<tr>
+		  <td>
+			<span class='t'>
+      		<span style='font-size:10px;font-weight:bold;line-height:120%'>
+			iB_UPLOAD
+      		<br>&nbsp;&nbsp;|-&nbsp;cgi-bin
+      		<br>&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;<span style='color:red'>BACK_UP</span>
+      		<br>&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;<span style='color:red'>Data</span>
+      		<br>&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;<span style='color:blue'>Data.tar</span>
+      		<br>&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;<span style='color:red'>Database</span>
+      		<br>&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;<span style='color:blue'>Database.tar</span>
+      		<br>&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;<span style='color:blue'>ikonboard.cgi</span>
+      		<br>&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;<span style='color:blue'>ikonboard.conf</span>
+      		<br>&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;<span style='color:blue'>index.html</span>
+      		<br>&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;<span style='color:blue'>installer.cgi</span>
+      		<br>&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;<span style='color:red'>INSTALL_DATA</span>
+      		<br>&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;<span style='color:red'>install_modules</span>
+      		<br>&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;<span style='color:red'>Languages</span>
+      		<br>&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;<span style='color:blue'>Languages.tar</span>
+      		<br>&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;<span style='color:blue'>non-cgi.tar</span>
+      		<br>&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;<span style='color:red'>Skin</span>
+      		<br>&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;<span style='color:blue'>Skin.tar</span>
+      		<br>&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;<span style='color:red'>Sources</span>
+      		<br>&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;<span style='color:blue'>Sources.tar</span>
+      		<br>&nbsp;&nbsp;|-&nbsp;public_html
+      		<br>&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;<span style='color:red'>iB_html</span>
+      		<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;<span style='color:red'>uploads</span>
+      		<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;<span style='color:red'>non-cgi</span>
+			</span>
+		   </td>
+		  </tr>
+		</table>
+	</td>
+	<td width='100%' valign='middle' align='center'>
+		<table border='0' width='100%' style='border:1px thin black'>
+		<tr>
+		  <td><span class='b'><span style='color:red'>?</span> Jargon Buster</span>
+			  <br><span class='bt'><b>Ikonboards file types</b>
+			  <br><br>
+			  <b>.tar files</b> are "Tape ARchives", based on the tape back-up devices used by early Unix platforms. 
+			  It's an extremely useful way to transport many files WITHOUT compression whilst retaining the original file names, data and
+			  permission settings. One .tar file could contain tens, hundreds or even thousands of files.
+		      <br>These files are always uploaded in binary.
+			  <br><br>
+			  <b>.cgi files</b> are 'Common Gateway Interface' files. A common misconception is that CGI is a language. This is not true.
+			  A CGI is a server process, many different languages can be run as a CGI process including Perl and PHP.
+			  <br>These files are always uploaded in ASCII (Text).
+		   </td>
+		 </tr>
+		</table>
+		 <br>
+		<table border='0' width='100%' style='border:1px thin black'>
+		<tr>
+		  <td><span class='b'><span style='color:red'>!</span> Windows / NT Tips</span>
+			  <br><span class='bt'><b>Running .cgi files as .pl</b>
+			  <br><br>
+			Although it only takes a few minutes to allow NT servers to run CGI scripts as ".cgi", most NT servers only allow
+			".pl" extensions to be executed.
+			<br>If this is the case, then rename "ikonboard.cgi" and "installer.cgi" to "ikonboard.pl" and "installer.pl" now.
+		   </td>
+		 </tr>
+		</table>
+	</td>
+   </tr>
+  </table>
+
+
+</td>
+</tr>
+</table>
+<!-- End tables -->
+
+<br>
+
+<table width='90%' align='center' cellspacing='0' cellpadding='4'>
+<tr>
+ <td colspan='2'>
+	<span class='s'><span style='color:red'>&gt;</span> Uploading the Ikonboard files</span>
+    <br><br>
+    <span class='t'>For this step, you'll need a good FTP client. Try <a href='http://www.smartftp.com' class='t' target='_blank'>Smart FTP</a> for Windows
+    based operating systems and <a href='http://www.interarchy.com' class='t' target='_blank'>InterArchy</a> for Macintosh. (Note:
+    we are no way affiliated with these companies, these are the popular choice according to the ikonboard community.)
+ </td>
+</tr>
+<tr>
+	<td width='75%' valign='top' align='center'>
+		<table border='0' width='100%' style='border:1px thin black'>
+		<tr>
+		  <td colspan='2'><span class='b'><span style='color:red'>&gt;</span> Uploading: Step 1</span>
+			  <br><span class='bt'><b>Creating the new directories</b>
+			  <br><br>
+              Using your FTP client, navigate into your <span style='color:red'>cgi-bin</span>. (If you do not have a <span style='color:red'>cgi-bin</span>, create a new directory called '<span style='color:red'>cgi-bin</span>'
+              on your server. CHMOD this directory to '0755' [ see 'Figure A' ]).
+              <br><br>
+              You should be in your <span style='color:red'>cgi-bin</span>. If you have other scripts in your <span style='color:red'>cgi-bin</span>, you may wish to create another directory
+              called '<span style='color:red'>ikonboard</span>'. If you create this directory, CHMOD the directory to '0755' [ see 'Figure A' ].
+              <br>This guide will call this directory your '<span style='color:green'>ikonboard CGI directory</span>'.<br>&nbsp;
+          </td>
+         <tr>
+          <td align='center'><img src='img/fig_a.gif' border='0'><br><font size='2' face='arial' color='#000000'>Figure A:<i>Permission Settings for '0755'</i></font></td>
+          <td align='center'><img src='img/fig_b.gif' border='0'><br><font size='2' face='arial' color='#000000'>Figure B:<i>Permission Settings for '0777'</i></font></td>
+         </tr>
+         <tr>
+         <td colspan='2' class='bt'>
+            <br>
+            You should now be in your <span style='color:green'>ikonboard CGI directory</span>. Create the following directories:
+            <br><b><span style='color:red'>BACK_UP, Data, Database, INCOMING, INSTALL_DATA, install_modules, Languages, OUTGOING, Skin and Sources</span></b>
+            <br>Now CHMOD the directories you have just created to '0777' (See Figure B).
+
+            <br><br>
+            <span class='b'><span style='color:red'>&gt;</span> Uploading: Step 2</span>
+            <br><b>Uploading the <span style='color:green'>ikonboard CGI directory</span> files</b>
+            <br><br>
+            Upload the contents of the <span style='color:red'>INSTALL_DATA</span> directory from the un-zipped zip file on your computer into
+            the newly created <span style='color:red'>INSTALL_DATA</span> directory on your server. All of these files should be uploaded in <b>ASCII</b>.
+            <br><br>Navigate into the <span style='color:red'>INSTALL_DATA</span> directory on the server. CHMOD all the files
+            [<span style='color:blue'> board_rules.dat, cgi_path.html, cgi_url.html, email_template.dat, index.html, mem_groups.dat, non-cgi_path.html, non_cgi_url.html</b></span> ]
+            to '0777' (See Figure B).
+            <br><br>
+            Upload the contents of the <span style='color:red'>install_modules</span> directory from the un-zipped zip file on your computer into
+            the newly created <span style='color:red'>install_modules</span> directory on your server. All of these files should be uploaded in <b>ASCII</b>.
+            <br><br>Navigate into the <span style='color:red'>install_modules</span> directory on the server. CHMOD all the files and directories
+            to '0777' (See Figure B).
+            <br><br>
+            Navigate back to your <span style='color:green'>ikonboard CGI directory</span>.
+            <br><br>
+            Now upload all the <b>*.tar</b> files
+            [<span style='color:blue'>Data.tar, Database.tar, Languages.tar, non-cgi.tar, Skin.tar, Sources.tar</span> ]
+            in <b>BINARY</b>. CHMOD these files to '0777' (See Figure B).
+            <br><br>
+            You should still be in your <span style='color:green'>ikonboard CGI directory</span>.
+            <br>Upload <span style='color:blue'>ikonboard.cgi and installer.cgi</span> (or ikonboard.pl and installer.pl if you've changed the suffix).
+            in <b>ASCII</b>. CHMOD these files to '0755' (See Figure A).
+            <br><br>NOTE: Your webhost may use a different set of permissions to execute perl scripts. Please double check with your webhost if you are unsure.
+            <br><br>Upload <span style='color:blue'>ikonboard.conf</span>
+            in <b>ASCII</b>. CHMOD this file to '0777' (See Figure A).
+            <br><br>
+            <span class='b'><span style='color:red'>&gt;</span> Uploading: Step 3</span>
+            <br><b>Creating a directory in the 'public_html' part of your webspace</b>
+            <br><br>
+            Navigate into the <span style='color:blue'>public_html</span> directory on your server. You should see all the webpages from your webiste in this directory.
+            <br><br>
+            Create a directory called <span style='color:blue'>iB_html</span>.
+            <br><br>
+            CHMOD this new directory to '0777' (see Figure B)
+            <br><br>
+            Create a directory called <span style='color:blue'>uploads</span> <i>inside the iB_html</i> directory and CHMOD to 0777.
+            <br>Create a directory called <span style='color:blue'>non-cgi</span> <i>inside the iB_html</i> directory and CHMOD to 0777.
+            <br><br>
+            CHMOD this new directory to '0777' (see Figure B)
+            <br><br>
+            You have now completed all the file uploads needed to install Ikonboard.
+		   </td>
+		 </tr>
+		</table>
+     </td>
+	<td width='25%' valign='top' align='center'>
+		<table border='0' width='100%' style='border:1px thin black'>
+		<tr>
+		  <td><span class='b'><span style='color:red'>?</span> Jargon Buster</span>
+			  <br><span class='bt'><b>Uploading Information</b>
+			  <br><br>
+			  <b>FTP</b> is an acronym for <b>F</b>ile <b>T</b>ransfer <b>P</b>rotocol. FTP is a method of tranferring files from
+              your local machines hard drive to the remote (the server) machines hard drive.
+			  <br><br>
+			  <b>ASCII</b> mode is 'plain text'. Examples of ASCII files would be 'HTML', 'Javascript', 'PHP' and 'Perl' scripts.
+              <br><br>
+              <b>BINARY</b> mode is used for graphic files such as 'jpeg', 'png' 'gif' and other data types such as 'Archived Files (.tar)' and 'Compressed Files (.gz)'.
+              <br><br>
+              <b>CHMOD</b> is a unix command to alter the permissions set on a file. You can set the 'read', 'write' and 'execute' from your FTP client. Note: CHMOD is not needed when using Win/NT servers
+              <br><br>
+              <b>public_html</b> is the term this install guide uses for the default directory webpages (such as HTML) are served from. 'htdocs' is another common name for this directory.
+              <br><br>
+              <b>cgi-bin</b> is the term this install guide uses for the directory that contains the executable perl scripts. If you don't have a cgi-bin, your server can execute scripts from any directory.
+		   </td>
+		 </tr>
+		</table>
+    </td>
+</tr>
+</table>
+
+<br>
+
+<table width='90%' align='center' cellspacing='0' cellpadding='4'>
+<tr>
+ <td colspan='2'>
+	<span class='s'><span style='color:red'>&gt;</span> Finishing the installation</span>
+    <br><br>
+    <span class='t'>Once the file upload steps have been completed, run the installer. To do this, open up a new browser window and type in
+                    the URL to the installer.cgi (ie: www.domain.com/cgi-bin/ib3/installer.cgi).
+                    <br><br>Once the Ikonboard Installation Wizard has loaded, you can begin to configure the options.
+                    <br>You should be able to leave the top table alone (with the installation options). If you are unsure of your
+                    correct paths, check with your web space provider - they will know. Once you are happy that the information is
+                    correct, submit the form. <b>This step may take up to 5 minutes</b>
+                    <br><br>
+                    Follow the rest of the directions to set up an administrators account.
+                    <br><br> Once you have logged into your AdminCP, please remove the installer.cgi program from your server. Leaving it
+                    there is a big security risk.
+                    <br>Enjoy!
+ </td>
+</tr>
+</table>
+
+</body>
+</html>

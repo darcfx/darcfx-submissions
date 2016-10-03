@@ -1,0 +1,328 @@
+###############################################################################
+# Stats.lib                                                                   #
+###############################################################################
+# UltraBoard Ver. 1.62 by UltraScripts.com                                    #
+# Scripts written by Jacky W.W. Yung, WebMaster@UltraScripts.com              #
+# Available from http://www.UltraScripts.com/UltraBoard/                      #
+# --------------------------------------------------------------------------- #
+# PROGRAM NAME : UltraBoard                                                   #
+# VERSION : 1.62                                                              #
+# LAST MODIFIED : 29/07/1999                                                  #
+# =========================================================================== #
+# COPYRIGHT NOTICE :                                                          #
+#                                                                             #
+# Copyright (c) 1999 Jacky Yung. All Rights Reserved.                         #
+#                                                                             #
+# This program is free software; you can change or modify it as you see fit.  #
+# However, modified versions cannot be sold or distributed.  You cannot alter #
+# the copyright and "powered by" notices throughout the scripts. These        #
+# notices must be clearly visible to the end users.                           #
+#                                                                             #
+# WARRANTY DISCLAIMER:                                                        #
+#                                                                             #
+# THIS PROGRAM IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT WITHOUT #
+# ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR       #
+# FITNESS FOR A PARTICULAR PURPOSE.                                           #
+###############################################################################
+
+###############################################################################
+# WriteStats                                                                  #
+###############################################################################
+sub WriteStats {
+	my (@Months) = ("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Des");
+	my (@Days) = ("Sun","Mon","Tue","Wed","Thu","Fri","Sat");
+	my ($IP,$RemoteHost,$Agent,$Referer,$Time,%Hits,$Value);
+
+	$IP = $ENV{'REMOTE_ADDR'};				# Get IP address
+	$RemoteHost = $ENV{'REMOTE_HOST'};		# Get remote host address
+	$Referer = $ENV{'HTTP_REFERER'};		# Get referer address
+	if (!$Referer) {
+		$Referer="BookMark";
+	}
+	$Agent = $ENV{'HTTP_USER_AGENT'};		# Get user agent
+	$Referer =~ s/\?(.|\n)*//ig;
+	$Time=time;								# Get time
+	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($Time);
+	my ($CurrentDate) = $mday." ".$Months[$mon].", ".$Days[$wday];
+	open(IPS,"$StatsPath/IPs.list");
+		flock(IPS,2) if ($FLock);
+		my (@IPs)=<IPS>;
+	close(IPS);
+
+	open(CDATE,"$StatsPath/CDate.dat");
+		flock(CDATE,2) if ($FLock);
+		my ($LastDate)=<CDATE>;
+	close(CDATE);
+	my ($NewDay) = "N";
+	$NewDay = "Y" if ($CurrentDate ne $LastDate);
+
+	if (("@IPs" !~ /$IP/ig)||($NewDay eq "Y")) {
+		open(HITS,"$StatsPath/Total.hits");
+			flock(HITS,2) if ($FLock);
+			my ($TotalHits)=<HITS>;
+		close(HITS);
+		open(HITS,">$StatsPath/Total.hits");
+			flock(HITS,2) if ($FLock);
+			print HITS ++$TotalHits;
+			flock(HITS,8) if ($FLock);
+		close(HITS);
+# Process Last Date			
+		if ($NewDay eq "Y") {
+			open(CDATE,">$StatsPath/CDate.dat");
+				flock(CDATE,2) if ($FLock);
+				print CDATE $CurrentDate;
+				flock(CDATE,8) if ($FLock);
+			close(CDATE);
+		}
+# Process IPs	
+		open(IPS,">>$StatsPath/IPs.list") if ($NewDay eq "N");
+		open(IPS,">$StatsPath/IPs.list") if ($NewDay eq "Y");
+			flock(IPS,2) if ($FLock);
+			print IPS $IP."\n";
+			flock(IPS,8) if ($FLock);
+		close(IPS);
+# Process Today Hits	
+		open(HITS,"$StatsPath/Today.hits");
+			flock(HITS,2) if ($FLock);
+			my ($TodayHits)=<HITS>;
+		close(HITS);
+		if ($NewDay eq "Y") {
+			open(HITS,">$StatsPath/Today.hits");
+				flock(HITS,2) if ($FLock);
+				print HITS "1";
+				flock(HITS,8) if ($FLock);
+			close(HITS);
+			$TodayHits=0 if (!$TodayHits);
+			if ($LastDate) {
+				open(HITS,">>$StatsPath/Days.hits");
+					flock(HITS,2) if ($FLock);
+					print HITS $LastDate."|^|".$TodayHits."\n";
+					flock(HITS,8) if ($FLock);
+				close(HITS);
+			}
+		}else{
+			open(HITS,">$StatsPath/Today.hits");
+				flock(HITS,2) if ($FLock);
+				print HITS ++$TodayHits;
+				flock(HITS,8) if ($FLock);
+			close(HITS);
+		}
+# Process Referers
+		%Hits=();
+		open(REFERER,"$StatsPath/Referers.log");
+			my (@RefURLs)=<REFERER>;
+		close(REFERER);
+		chomp(@RefURLs);
+		my ($RefURL);
+		foreach $RefURL (@RefURLs) {
+			($RefURL,$Value)=split(/\|\^\|/,$RefURL);
+			 $Hits{$RefURL}=$Value;
+		}
+		$Hits{$Referer}++;
+		open(REFERER,">$StatsPath/Referers.log");
+			flock(REFERER,2) if ($FLock);
+			foreach $RefURL (keys %Hits) {
+				print REFERER $RefURL."|^|".$Hits{$RefURL}."\n";
+			}
+			flock(REFERER,8) if ($FLock);
+		close(REFERER);
+# Process Browsers
+		%Hits=();
+		$Max=0;
+		my ($Part,$BrowserVersion,$BrowserName);
+		my (@Browsers) = ("Lynx","MOSAIC","AOL","Opera","JAVA","MacWeb","WebExplorer","OmniWeb");
+		for (@Browsers) {
+			if ($Agent =~/$_/i) {
+				$BrowserName = $_;
+			}
+		}
+		if (($Agent =~ /Mozilla/isg)&&($Agent =~ /Opera/isg)) {
+			$Part =(split(/\(/, $Agent))[0];
+			$BrowserVersion = (split(/\//, $Part))[1];
+			$BrowserVersion = (split(/ /,$BrowserVersion))[0];
+			$BrowserVersion =~ s/([\d\.]+)/$1/isg;
+			$BrowserName = "Opera_$BrowserVersion";
+		}elsif (($Agent =~ /Mozilla/isg)&&($Agent !~ /MSIE/isg)) {
+			$Part =(split(/\(/, $Agent))[0];
+			$BrowserVersion = (split(/\//, $Part))[1];
+			$BrowserVersion = (split(/ /,$BrowserVersion))[0];
+			$BrowserVersion =~ s/([\d\.]+)/$1/isg;
+			$BrowserName = "Netscape_$BrowserVersion";
+		}elsif (($Agent =~ /Mozilla/isg)&&($Agent =~ /MSIE/isg)) {
+			$Part = (split(/\(/, $Agent))[1];
+			$Part = (split(/\;/,$Part))[1];
+			$BrowserVersion = (split(/ /,$Part))[2];
+            $BrowserVersion =~ s/([\d\.]+)/$1/isg;
+			$BrowserName = "MSIE_$BrowserVersion";
+		}
+		if ($BrowserName eq "")	{
+			$BrowserName = "Other_$Agent";
+			$BrowserName=~s/ /_/isg;
+		}
+		open(HITS,"$StatsPath/Browsers.hits");
+			flock(HITS,2) if ($FLock);
+			@Browsers=<HITS>;
+		close(HITS);
+		chomp(@Browsers);
+		my ($Browser);
+		foreach $Browser (@Browsers) {
+			($Browser,$Value)=split(/\|\^\|/, $Browser);
+			$Hits{$Browser}=$Value;
+			$Max=$Value and $MaxBrowser=$Browser if ($Value>$Max);
+		}
+		$Hits{$BrowserName}++;
+		open(HITS,">$StatsPath/Browsers.hits");
+			flock(HITS,2) if ($FLock);
+			foreach $Browser (sort keys %Hits) {
+				$Hits{$Browser}=1 if (!$Hits{$Browser});
+				print HITS $Browser."|^|".$Hits{$Browser}."\n";
+			}
+			flock(HITS,8) if ($FLock);
+		close(HITS);
+		open(POP,">$StatsPath/Browsers.pop");
+			flock(POP,2) if ($FLock);
+			print POP $MaxBrowser."|^|".$Max;
+			flock(POP,8) if ($FLock);
+		close(POP);
+# Process Log
+		open(LOG,"$StatsPath/Visitors.log");
+			flock(LOG,2) if ($FLock);
+			my (@Visitors)=<LOG>;
+		close(LOG);
+		if (scalar(@Visitors) >= $MaxVisitorLog) {
+			open(LOG,">$StatsPath/Visitors.log");
+				flock(LOG,2) if ($FLock);
+				for ($i=scalar(@Visitors)-$MaxVisitorLog+1;$i<scalar(@Visitors);$i++) {
+					print LOG $Visitors[$i];
+				}
+				print LOG localtime($Time)."|^|".$IP."|^|".$RemoteHost."|^|".$Referer."|^|".$BrowserName."\n";
+				flock(LOG,8) if ($FLock);
+			close(LOG);
+		}else{
+			open(LOG,">>$StatsPath/Visitors.log");
+				flock(LOG,2) if ($FLock);
+				print LOG localtime($Time)."|^|".$IP."|^|".$RemoteHost."|^|".$Referer."|^|".$BrowserName."\n";
+				flock(LOG,8) if ($FLock);
+			close(LOG);
+		}
+# Process Day Hits
+		%Hits=();
+		$Max=0;
+		open(HITS,"$StatsPath/Day.hits");
+			flock(HITS,2) if ($FLock);
+			my (@Day)=<HITS>;
+		close(HITS);
+		chomp(@Day);
+		my ($Hour);
+		foreach $Hour (@Day) {
+			($Hour,$Value)=split(/\|\^\|/, $Hour);
+			$Hits{$Hour}=$Value;
+			$Max=$Value and $MaxHour=$Hour if ($Value>$Max);
+		}
+		$Hits{$hour}++;
+		open(HITS,">$StatsPath/Day.hits");
+			flock(HITS,2) if ($FLock);
+			for (0..23) {
+				$Hits{$_}=0 if (!$Hits{$_});
+				print HITS $_."|^|".$Hits{$_}."\n";
+			}
+			flock(HITS,8) if ($FLock);
+		close(HITS);
+		open(POP,">$StatsPath/Day.pop");
+			flock(POP,2) if ($FLock);
+			print POP $MaxHour."|^|".$Max;
+			flock(POP,8) if ($FLock);
+		close(POP);
+# Process Week Hits
+		%Hits=();
+		$Max=0;
+		open(HITS,"$StatsPath/Week.hits");
+			flock(HITS,2) if ($FLock);
+			my (@Week)=<HITS>;
+		close(HITS);
+		chomp(@Week);
+		my ($Day);
+		foreach $Day (@Week) {
+			($Day,$Value)=split(/\|\^\|/, $Day);
+			$Hits{$Day}=$Value;
+			$Max=$Value and $MaxDay=$Day if ($Value>$Max);
+		}
+		$Hits{$wday}++;
+		open(HITS,">$StatsPath/Week.hits");
+			flock(HITS,2) if ($FLock);
+			for (0..6) {
+				$Hits{$_}=0 if (!$Hits{$_});
+				print HITS $_."|^|".$Hits{$_}."\n";
+			}
+			flock(HITS,8) if ($FLock);
+		close(HITS);
+		open(POP,">$StatsPath/Week.pop");
+			flock(POP,2) if ($FLock);
+			print POP $MaxDay."|^|".$Max;
+			flock(POP,8) if ($FLock);
+		close(POP);
+	}
+}
+
+###############################################################################
+# WriteLog                                                                    #
+###############################################################################
+sub WriteLog {
+	my ($IP,$RemoteHost,$Agent,$Referer,$Time,%Hits,$Value);
+
+	$IP = $ENV{'REMOTE_ADDR'};				# Get IP address
+	$RemoteHost = $ENV{'REMOTE_HOST'};		# Get remote host address
+	$Referer = $ENV{'HTTP_REFERER'};		# Get referer address
+	if (!$Referer) {
+		$Referer="Unknown";
+	}
+	$Agent = $ENV{'HTTP_USER_AGENT'};		# Get user agent
+	$Referer =~ s/\?(.|\n)*//ig;
+	$Time=time;								# Get time
+
+# Process Action Log
+	open(LOG,"$StatsPath/Action.log");
+		flock(LOG,2) if ($FLock);
+		my (@Actions)=<LOG>;
+	close(LOG);
+	if (scalar(@Actions) >= $MaxActionLog) {
+		open(LOG,">$StatsPath/Action.log");
+			flock(LOG,2) if ($FLock);
+			for ($i=scalar(@Actions)-$MaxActionLog+1;$i<scalar(@Actions);$i++) {
+				print LOG $Actions[$i];
+			}
+			print LOG localtime($Time)."|^|".$IP."|^|".$RemoteHost."|^|".$Agent."|^|".$in{'Action'}."|^|".$in{'Category'}."|^|".$in{'Board'}."|^|".$in{'Post'}."|^|".$in{'ID'}."|^|".$UserName."\n";
+			flock(LOG,8) if ($FLock);
+		close(LOG);
+	}else{
+		open(LOG,">>$StatsPath/Action.log");
+			flock(LOG,2) if ($FLock);
+			print LOG localtime($Time)."|^|".$IP."|^|".$RemoteHost."|^|".$Agent."|^|".$in{'Action'}."|^|".$in{'Category'}."|^|".$in{'Board'}."|^|".$in{'Post'}."|^|".$in{'ID'}."|^|".$UserName."\n";
+			flock(LOG,8) if ($FLock);
+		close(LOG);
+	}
+# Process Action Hits
+#	%Hits=();
+#	open(HITS,"$StatsPath/Action.hits");
+#		flock(HITS,2) if ($FLock);
+#		my (@Actions)=<HITS>;
+#	close(HITS);
+#	chomp(@Actions);
+#	my ($Action);
+#	foreach $Action (@Actions) {
+#		($Action,$Value)=split(/\|\^\|/, $Action);
+#		$Hits{$Action}=$Value;
+#	}
+#	$Hits{$in{'Action'}.".".$in{'Category'}.".".$in{'Board'}.".".$in{'Post'}.".".$in{'ID'}}++;
+#	open(HITS,">$StatsPath/Action.hits");
+#		flock(HITS,2) if ($FLock);
+#		foreach $Action (keys %Hits) {
+#			$Hits{$Action}=1 if (!$Hits{$_});
+#			print HITS $Action."|^|".$Hits{$Action}."\n";
+#		}
+#		flock(HITS,8) if ($FLock);
+#	close(HITS);	
+}
+###############################################################################
+1;# End of Stats.lib file
+###############################################################################

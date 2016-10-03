@@ -1,0 +1,385 @@
+CREATE TABLE ib_active_sessions (
+   ID varchar(32) DEFAULT '0' NOT NULL,
+   MEMBER_NAME varchar(32),
+   MEMBER_PASSWORD varchar(32),
+   MEMBER_ID varchar(32),
+   THIS_IP varchar(16) ,
+   LAST_LOG_IN int(10),
+   USER_AGENT varchar(64),
+   RUNNING_TIME int(10),
+   MEMBER_LOGSTATE tinyint(1),
+   LOCATION varchar(40),
+   LOG_IN_TYPE tinyint(1),
+   MEMBER_GROUP smallint(3),
+   PRIMARY KEY (ID)
+);
+CREATE TABLE ib_address_books (
+   ID smallint(10) unsigned DEFAULT '0' NOT NULL,
+   IN_MEMBER_ID varchar(32) NOT NULL,
+   MEMBER_ID varchar(32) NOT NULL,
+   IN_MEMBER_NAME char(32) NOT NULL,
+   RECEIVE_MSG tinyint(1),
+   IN_MEMBER_DESC char(50),
+   PRIMARY KEY (ID)
+);
+CREATE TABLE ib_attachments (
+   ID smallint(10) unsigned DEFAULT '0' NOT NULL,
+   MIME_TYPE varchar(128),
+   FILE_NAME varchar(64),
+   PRIMARY KEY (ID)
+);
+CREATE TABLE ib_authorisation (
+   ID smallint(10) unsigned DEFAULT '0' NOT NULL,
+   UNIQUE_CODE char(32) NOT NULL,
+   DATE_ENTERED int(10) DEFAULT '0' NOT NULL,
+   MEMBER_ID char(32) NOT NULL,
+   MEMBER_NAME char(32) NOT NULL,
+   THIS_IP char(16),
+   MEMBER_EMAIL char(128) NOT NULL,
+   _WHERE char(32),
+   MEMBER_GROUP tinyint(2),
+   PRIMARY KEY (ID)
+);
+CREATE TABLE ib_categories (
+   CAT_ID tinyint(3) unsigned DEFAULT '0' NOT NULL,
+   CAT_POS tinyint(3),
+   CAT_STATE varchar(10),
+   CAT_NAME varchar(128) NOT NULL,
+   CAT_DESC text,
+   SUB_CAT_ID int(10),
+   VIEW varchar(50),
+   IMAGE varchar(128),
+   URL varchar(128),
+   PRIMARY KEY (CAT_ID)
+);
+CREATE TABLE ib_email_templates (
+   ID varchar(20) NOT NULL,
+   TYPE char(1) NOT NULL,
+   TEMPLATE text,
+   PRIMARY KEY (ID)
+);
+CREATE TABLE ib_forum_info (
+   FORUM_ID smallint(5) DEFAULT '0' NOT NULL,
+   FORUM_TOPICS mediumint(6),
+   FORUM_POSTS mediumint(6),
+   FORUM_LAST_POST int(10),
+   FORUM_LAST_POSTER varchar(32),
+   FORUM_LAST_POSTER_N varchar(32),
+   FORUM_NAME varchar(128) NOT NULL,
+   FORUM_DESC text,
+   FORUM_POSITION tinyint(2),
+   FORUM_IBC tinyint(1),
+   FORUM_HTML tinyint(1),
+   FORUM_STATUS varchar(10),
+   FORUM_START_THREADS varchar(32),
+   FORUM_REPLY_THREADS varchar(32),
+   FORUM_VIEW_THREADS varchar(32),
+   FORUM_PROTECT varchar(32),
+   CATEGORY tinyint(2) DEFAULT '0' NOT NULL,
+   L_TOPIC_TITLE varchar(32),
+   L_TOPIC_ID smallint(5),
+   SORT_KEY varchar(32),
+   SORT_ORDER varchar(32),
+   PRUNE_DAYS tinyint(3),
+   SHOW_RULES tinyint(1),
+   ALLOW_ATTACH tinyint(1),
+   MODERATE tinyint(1),
+   PRIMARY KEY (FORUM_ID)
+);
+CREATE TABLE ib_forum_moderators (
+   MODERATOR_ID int(10) unsigned DEFAULT '0' NOT NULL,
+   FORUM_ID int(5) DEFAULT '0' NOT NULL,
+   MEMBER_NAME varchar(32) NOT NULL,
+   MEMBER_ID varchar(32) DEFAULT '0' NOT NULL,
+   EDIT_POST tinyint(1),
+   EDIT_TOPIC tinyint(1),
+   DELETE_POST tinyint(1),
+   DELETE_TOPIC tinyint(1),
+   VIEW_IP tinyint(1),
+   OPEN_TOPIC tinyint(1),
+   CLOSE_TOPIC tinyint(1),
+   MASS_MOVE tinyint(1),
+   MASS_PRUNE tinyint(1),
+   MOVE_TOPIC tinyint(1),
+   PIN_TOPIC tinyint(1),
+   UNPIN_TOPIC tinyint(1),
+   POST_Q tinyint(1),
+   TOPIC_Q tinyint(1),
+   ALLOW_WARN tinyint(1),
+   PRIMARY KEY (MODERATOR_ID)
+);
+CREATE TABLE ib_forum_poll_voters (
+   ID bigint(20) DEFAULT '0' NOT NULL,
+   VOTER_IP char(16) NOT NULL,
+   DATE int(10) DEFAULT '0' NOT NULL,
+   POLL_ID bigint(20) DEFAULT '0' NOT NULL,
+   MEMBER_ID varchar(32),
+   FORUM_ID bigint(20),
+   PRIMARY KEY (ID)
+);
+CREATE TABLE ib_forum_polls (
+   ID bigint(20) DEFAULT '0' NOT NULL,
+   POLL_ID bigint(20) DEFAULT '0' NOT NULL,
+   POLL_TITLE varchar(128) DEFAULT '0' NOT NULL,
+   POLL_DESC text,
+   POLL_STARTED int(10),
+   POLL_ANSWERS text,
+   POLL_STARTER varchar(32),
+   POLL_STARTER_N varchar(32),
+   TOTAL_VOTES bigint(20),
+   FORUM_ID bigint(20),
+   PRIMARY KEY (ID)
+);
+CREATE TABLE ib_forum_rules (
+   ID mediumint(6) DEFAULT '0' NOT NULL,
+   RULES_TITLE varchar(128) NOT NULL,
+   RULES_TEXT text,
+   LAST_UPDATE int(10),
+   SHOW_ALL    tinyint(1),
+   PRIMARY KEY (ID)
+);
+CREATE TABLE ib_forum_subscriptions (
+   ID mediumint(9) unsigned DEFAULT '0' NOT NULL,
+   MEMBER_ID varchar(32) NOT NULL,
+   MEMBER_NAME varchar(32),
+   EMAIL_ADDRESS varchar(100),
+   FORUM_ID tinyint(3) DEFAULT '0' NOT NULL,
+   TOPIC_ID bigint(20) DEFAULT '0' NOT NULL,
+   DATE_STARTED int(10),
+   LAST_SENT int(10),
+   PRUNE tinyint(2),
+   rFULL tinyint(1),
+   PRIMARY KEY (ID)
+);
+CREATE TABLE ib_forum_topics (
+   TOPIC_ID smallint(8) unsigned DEFAULT '0' NOT NULL,
+   TOPIC_TITLE char(70) NOT NULL,
+   TOPIC_DESC char(70),
+   TOPIC_STATE char(8),
+   TOPIC_POSTS smallint(4),
+   TOPIC_STARTER char(32),
+   TOPIC_START_DATE int(10),
+   TOPIC_LAST_POSTER char(32),
+   TOPIC_LAST_DATE int(10),
+   TOPIC_ICON tinyint(2),
+   TOPIC_STARTER_N char(32),
+   TOPIC_LASTP_N char(32),
+   POLL_STATE char(8),
+   LAST_VOTE int(10),
+   TOPIC_VIEWS smallint(5),
+   FORUM_ID tinyint(3),
+   APPROVED tinyint(1),
+   TOPIC_AUTHOR_TYPE tinyint(1),
+   PIN_STATE tinyint(1),
+   MOVED_TO varchar(64),
+   PRIMARY KEY (TOPIC_ID)
+);
+CREATE TABLE ib_help (
+   ID tinyint(2) unsigned DEFAULT '0' NOT NULL,
+   TITLE varchar(128) NOT NULL,
+   TEXT text,
+   PRIMARY KEY (ID)
+);
+CREATE TABLE ib_mem_groups (
+   ID tinyint(2) unsigned DEFAULT '0' NOT NULL,
+   VIEW_BOARD tinyint(1),
+   MEM_INFO tinyint(1),
+   OTHER_TOPICS tinyint(1),
+   USE_SEARCH tinyint(1),
+   EMAIL_FRIEND tinyint(1),
+   INVITE_FRIEND tinyint(1),
+   EDIT_PROFILE tinyint(1),
+   POST_NEW_TOPICS tinyint(1),
+   REPLY_OWN_TOPICS tinyint(1),
+   REPLY_OTHER_TOPICS tinyint(1),
+   EDIT_OWN_POSTS tinyint(1),
+   DELETE_OWN_POSTS tinyint(1),
+   OPEN_CLOSE_TOPICS tinyint(1),
+   DELETE_OWN_TOPICS tinyint(1),
+   POST_POLLS tinyint(1),
+   VOTE_POLLS tinyint(1),
+   USE_PM tinyint(1),
+   IS_SUPMOD tinyint(1),
+   ACCESS_CP tinyint(1),
+   TITLE char(32) NOT NULL,
+   CAN_REMOVE tinyint(1),
+   READ_AD_LOGS tinyint(1),
+   DELETE_AD_LOGS tinyint(1),
+   EDIT_GROUPS tinyint(1),
+   APPEND_EDIT tinyint(1),
+   ACCESS_OFFLINE tinyint(1),
+   AVOID_Q tinyint(1),
+   AVOID_FLOOD tinyint(1),
+   TEAM_ICON varchar(64),
+   ATTACH_MAX bigint(20),
+   PRIMARY KEY (ID)
+);
+CREATE TABLE ib_member_profiles (
+   MEMBER_ID varchar(32) DEFAULT '0' NOT NULL,
+   MEMBER_NAME varchar(32) NOT NULL,
+   MEMBER_GROUP tinyint(2) DEFAULT '0' NOT NULL,
+   MEMBER_PASSWORD varchar(32) NOT NULL,
+   MEMBER_EMAIL varchar(100) NOT NULL,
+   MEMBER_JOINED int(10) DEFAULT '0' NOT NULL,
+   MEMBER_LEVEL smallint(5),
+   MEMBER_IP varchar(16) NOT NULL,
+   MEMBER_AVATAR varchar(128),
+   AVATAR_DIMS varchar(9),
+   MEMBER_POSTS mediumint(7),
+   PHOTO varchar(70),
+   CANCEL_SUBS tinyint(1),
+   AOLNAME varchar(40),
+   ICQNUMBER varchar(40),
+   LOCATION varchar(128),
+   SIGNATURE text,
+   WEBSITE varchar(70),
+   YAHOONAME varchar(32),
+   MEMBER_TITLE varchar(64),
+   LAST_UPDATE int(10),
+   ALLOW_ADMIN_EMAILS tinyint(1),
+   TIME_ADJUST char(3),
+   INTERESTS text,
+   HIDE_EMAIL varchar(8),
+   PM_REMINDER varchar(3),
+   EMAIL_FULL_POST tinyint(1),
+   MEMBER_SKIN varchar(32),
+   WARN_LEVEL int(10),
+   LANGUAGE varchar(32),
+   MSNNAME varchar(32),
+   LAST_POST varchar(32),
+   ALLOW_POST tinyint(1),
+   VIEW_SIGS tinyint(1),
+   VIEW_IMG tinyint(1),
+   VIEW_AVS tinyint(1),
+   PRIMARY KEY (MEMBER_ID)
+);
+CREATE TABLE ib_message_data (
+   MESSAGE_ID int(10) unsigned DEFAULT '0' NOT NULL,
+   DATE int(10),
+   READ_STATE tinyint(1),
+   TITLE varchar(128),
+   MESSAGE text,
+   MESSAGE_ICON tinyint(2),
+   FROM_ID varchar(32),
+   FROM_NAME varchar(32),
+   REPLY tinyint(1),
+   REPLY_DATE int(10),
+   VIRTUAL_DIR varchar(32),
+   MEMBER_ID varchar(32),
+   RECIPIENT_ID varchar(32),
+   RECIPIENT_NAME varchar(32),
+   PRIMARY KEY (MESSAGE_ID)
+);
+CREATE TABLE ib_message_stats (
+   MEMBER_ID varchar(32) NOT NULL,
+   LAST_READ int(10),
+   NEW_MESSAGES tinyint(2),
+   LAST_FROM_NAME varchar(32),
+   LAST_FROM_ID varchar(32),
+   LAST_MSG_TITLE varchar(70),
+   LAST_MSG_ID int(10),
+   LAST_SENT int(10),
+   TOTAL_MESSAGES tinyint(1),
+   VIRTUAL_DIR text,
+   SHOW_POPUP tinyint(1),
+   PRIMARY KEY (MEMBER_ID)
+);
+CREATE TABLE ib_search_log (
+   LOG_ID smallint(10) unsigned DEFAULT '0' NOT NULL,
+   AUTHOR_ID varchar(32),
+   MEMBER_NAME varchar(32),
+   DATE int(10),
+   TOPIC_TITLE varchar(128),
+   POST text,
+   FORUM_ID smallint(5) DEFAULT '0' NOT NULL,
+   TOPIC_ID bigint(20) DEFAULT '0' NOT NULL,
+   POST_ID bigint(20) DEFAULT '0' NOT NULL,
+   POSTER_IP varchar(32),
+   PRIMARY KEY (LOG_ID)
+);
+CREATE TABLE ib_ssi_templates (
+   ID varchar(20) NOT NULL,
+   TEMPLATE text,
+   EXPORT_FILENAME varchar(32),
+   PRIMARY KEY (ID)
+);
+CREATE TABLE ib_templates (
+   ID varchar(20) NOT NULL,
+   TEMPLATE text,
+   NAME varchar(128),
+   PRIMARY KEY (ID)
+);
+CREATE TABLE ib_member_titles (
+   ID smallint(5) NOT NULL,
+   POSTS int(10),
+   TITLE varchar(128),
+   ADVANCE_GROUP smallint(5),
+   PIPS varchar(128),
+   PRIMARY KEY (ID)
+);
+CREATE TABLE ib_moderator_logs (
+   ID smallint(5) NOT NULL,
+   FORUM_ID int(5) DEFAULT '0',
+   TOPIC_ID bigint(20) DEFAULT '0',
+   POST_ID bigint(20) DEFAULT '0',  
+   MEMBER_ID varchar(32) NOT NULL,
+   MEMBER_NAME varchar(32) NOT NULL,
+   REMOTE_ADDR varchar(32),
+   HTTP_REFERER varchar(255),
+   TIME int(10),
+   TOPIC_TITLE varchar(128),
+   ACTION varchar(128),
+   QUERY_STRING varchar(128),
+   PRIMARY KEY (ID)
+);
+CREATE TABLE ib_mod_email (
+   ID smallint(5) NOT NULL,
+   FORUM_ID smallint(5) DEFAULT '0',
+   EMAIL varchar(128),  
+   TEXT text,
+   PRIMARY KEY (ID)
+);
+CREATE TABLE ib_mod_posts (
+   ID smallint(5) NOT NULL,
+   AUTHOR varchar(128),
+   IP_ADDR varchar(32),
+   POST_DATE int(10),
+   POST text,
+   AUTHOR_TYPE smallint(1),
+   TOPIC_ID smallint(5) DEFAULT '0',
+   FORUM_ID smallint(5) DEFAULT '0',
+   TYPE varchar(16), 
+   POST_ID bigint(20) NOT NULL,
+   ATTACH_ID bigint(32),
+   PRIMARY KEY (ID)
+);
+CREATE TABLE ib_forum_posts (
+   POST_ID bigint(20) NOT NULL,
+   AUTHOR varchar(32),
+   ENABLE_SIG varchar(8),
+   ENABLE_EMO varchar(8),
+   IP_ADDR varchar(32),
+   POST_DATE int(10),
+   POST_ICON smallint(3),
+   POST text,
+   AUTHOR_TYPE tinyint(1),
+   QUEUED tinyint(1),
+   TOPIC_ID bigint(20),
+   FORUM_ID int(10),
+   ATTACH_ID varchar(64),
+   ATTACH_HITS int(10),
+   ATTACH_TYPE varchar(128),
+   PRIMARY KEY (POST_ID)
+);
+CREATE TABLE ib_calendar (
+   MEMBER_ID              varchar(32)       not null,
+   MEMBER_NAME            varchar(32)       not null,
+   DAY                    smallint(5)       not null,
+   MONTH                  smallint(5)       not null,
+   YEAR                   smallint(5)       not null,
+   TIME_ADJUST            varchar(4),
+   PRIMARY KEY            (MEMBER_ID)
+);
+
+
+

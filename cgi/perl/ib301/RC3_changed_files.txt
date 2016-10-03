@@ -1,0 +1,85 @@
+ikonboard.cgi
+
+############################
+# DATA
+############################
+
+
+############################
+# DATABASE
+############################
+
+
+
+############################
+# SOURCES / ADMIN
+############################
+
+Adminlogs.pm
+Backup.pm
+DBMClient.pm       # New Module
+dbHandler.pm
+Filemanager.pm
+Functions.pm
+Import.pm
+MemberControl.pm
+SKIN.pm
+SkinHandler.pm
+SkinControl.pm
+SQLClient.pm        # New module
+Stats.pm
+Tools.pm
+
+
+############################
+# SOURCES
+############################
+
+Archive/Tar.pm
+Boards.pm
+Calendar.pm
+iDatabase/Driver/DBM.pm
+iDatabase/Driver/mySQL.pm
+iDatabase/Driver/pgSQL.pm
+iTextparser.pm
+Lib/ADMIN.pm
+Lib/FUNC.pm
+Misc/Cookies.pm
+Misc/MailMember.pm
+Misc/Report.pm
+Moderate.pm
+Post.pm
+Profile.pm
+Search/API/api_global.pm
+Search/API/api_DBM.pm
+Search/api.pm
+Sessions.pm
+Topic.pm
+UserCP/Menu.pm
+
+############################
+# SKINS
+############################
+// Remember to update the corresponding .cfg file
+// or you will get unexpected results when editing
+// the HTML via the adminCP
+
+BoardsView.pm
+SearchView.pm
+TopicView.pm
+Universal.pm
+
+############################
+# LANGUAGES
+############################
+
+/en/BoardWords.pm
+/en/ModerateWords.pm
+/en/ProfileWords.pm
+/en/TopicWords.pm
+/en/SearchWords.pm
+/en/UniversalWords.pm
+
+############################
+# iB_HTML
+############################

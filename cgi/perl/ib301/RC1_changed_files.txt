@@ -1,0 +1,115 @@
+CHANGE LOG
+
+----------------------
+Software: Ikonboard
+Version: v3 RC 1
+Release Date: 05/11/01 12:00 GMT
+----------------------
+
+ikonboard.cgi
+
+############################
+# DATA
+############################
+
+
+############################
+# DATABASE
+############################
+
+/Database/config/*.cfg  (Yup, all the .cfg files)
+
+############################
+# SOURCES / ADMIN
+############################
+
+/Sources/Admin/Backup.pm
+/Sources/Admin/dbHandler.pm     # New Module
+/Sources/Admin/Import.pm        # New module
+/Sources/Admin/Functions.pm
+/Sources/Admin/LangControl.pm
+/Sources/Admin/MemberGroups.pm
+/Sources/Admin/Options.pm
+/Sources/Admin/SkinHandler.pm
+/Sources/Admin/SKIN.pm
+
+
+############################
+# SOURCES
+############################
+
+/Sources/Boards.pm
+/Sources/Forum.pm
+/Sources/iDatabase/SQL.pm
+/Sources/iDatabase/Driver/*.pm  # New files
+/Sources/iDatabase/Admin/*.pm    # New files
+/Sources/iPoll.pm
+/Sources/iTextparser.pm
+/Sources/Help.pm
+/Sources/Lib/ADMIN.pm
+/Sources/Lib/FUNC.pm
+/Sources/Legends.pm
+/Sources/LogInOut.pm
+/Sources/Memberlist.pm
+/Sources/Misc/Cookies.pm
+/Sources/Misc/Track.pm
+/Sources/Online.pm
+/Sources/Post.pm
+/Sources/Printpage.pm
+/Sources/Profile.pm
+/Sources/Sessions.pm
+/Sources/Topic.pm
+
+/Sources/UserCP/Lostpass.pm
+/Sources/UserCP/Messenger.pm
+/Sources/UserCP/Menu.pm
+
+############################
+# SKINS
+############################
+
+/Default/BoardView.pm (and the .cfg file)
+/Default/ForumView.pm (and the .cfg file)
+/Default/HelpView.pm  (and the .cfg file)
+/Default/LegendsView.pm  (and the .cfg file)
+/Default/MemberlistView.pm  (and the .cfg file)
+/Default/MenuView.pm      (and the .cfg file)  # Added sub member_title
+/Default/OnlineView.pm    (and the .cfg file)
+/Default/PostView.pm    (and the .cfg file)
+/Default/PrintpageView.pm (and the .cfg file)
+/Default/TopicView.pm (and the .cfg file)
+/Default/UniversalView.pm (and the .cfg file)  #Added offline log in boxes
+/Default/Styles.pm
+/Default/gfx_data.cfg
+
+
+
+############################
+# LANGUAGES
+############################
+
+/en/ErrorWords.pm
+/en/ForumWords.pm
+/en/LogInWords.pm
+/en/ModCPWords.pm
+/en/OnlineWords.pm
+/en/PostWords.pm
+/en/PrintpageWords.pm
+/en/TopicWords.pm
+/en/UniversalWords.pm
+/en/UserCPWords.pm
+
+
+############################
+# iB_HTML
+############################
+
+non-cgi/Skin/Default/ikonboard.css    #added id's: #desc, #small
+non-cgi/Skin/Default/ikonboard.js
+non-cgi/Skin/Default/images/catcell.jpg
+non-cgi/Skin/Default/images/topcell.jpg
+non-cgi/Skin/Default/images/off.gif
+non-cgi/Skin/Default/images/on.gif
+non-cgi/Skin/Default/images/off-locked.gif
+non-cgi/Skin/Default/images/lpost_on.gif
+non-cgi/Skin/Default/images/lpost_off.gif

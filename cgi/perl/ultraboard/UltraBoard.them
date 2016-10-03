@@ -1,0 +1,24 @@
+<html>
+<head>
+<title><:UltraBoardTitle:></title>
+<:UltraBoardRedirect:>
+</head>
+<body>
+
+<!-- Header of UltraBoard -->
+<table width="<:TableWidth:>" border="0" bgcolor="<:TableBorderColor:>" cellspacing="0" cellpadding="0" align="<:TableAlign:>">
+<tr><td>
+<table width="100%" border="0" cellspacing="<:TableCellSpacing:>" cellpadding="<:TableCellPadding:>">
+<tr><td bgcolor="EEEEEE"><font face="Verdana" size="-1" color="Black"><b><:UltraBoardName:></b></font><br><font face="Verdana" size="-2" color="Black"><:UltraBoardDescription:></font></td></tr>
+<tr><td bgcolor="<:MenuBGColor:>">
+<:UltraBoardMenu:>
+</td></tr>
+</table>
+</td></tr>
+</table>
+
+<!-- Body of UltraBoard -->
+<:UltraBoardBody:>
+
+</body>
+</html>
