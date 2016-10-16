@@ -1,5 +1,7 @@
 # DarcFX.com and GitHub darcfx-submissions project
 
+Original content from https://www.darcfx.com/
+
 ## History of Darc's Programming Website: DarcFX.com
 DarcFX.com was created in August of 2000. I embarked upon setting up a personal website to post my programs, helpful code snipets, and tutorials on how to make programs, which at the time were mostly AOL mods. Things went slow. To say the least, DarcFX.com was competing with one of the largest tutorial and example sites on the web at that time, KnK 4 Life.
 
