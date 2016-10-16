@@ -2,10 +2,6 @@
 
 ## History of Darc's Programming Website: DarcFX.com
 DarcFX.com was created in August of 2000. I embarked upon setting up a personal website to post my programs, helpful code snipets, and tutorials on how to make programs, which at the time were mostly AOL mods. Things went slow. To say the least, DarcFX.com was competing with one of the largest tutorial and example sites on the web at that time, KnK 4 Life.
-# DarcFX.com and GitHub darcfx-submissions project
-
-## History of Darc's Programming Website: DarcFX.com
-DarcFX.com was created in August of 2000. I embarked upon setting up a personal website to post my programs, helpful code snipets, and tutorials on how to make programs, which at the time were mostly AOL mods. Things went slow. To say the least, DarcFX.com was competing with one of the largest tutorial and example sites on the web at that time, KnK 4 Life.
 
 At this stage in my life, I was a regular user of TheZone IRC Network	(irc.tzirc.com -> #TheZone). I hadn't really been close with Bill (KnK), but I did know him from #TheZone as he popped in from time to time. Bill eventually got busy with life, and decided to close KnK 4 Life, for life. But instead of rendering his site useless, he decided to sell CDs with all the files on it, hoping that someone would take-over. I bought KnK CD no. 2. Bill had allowed me to post all the KnK files with or without credit to himself. Of course, because I am not lame, he's been right here up-front in the story ever since.
 
@@ -15,7 +11,7 @@ Someone began a Facebook Group — "AOL Proggies"	— I assume for nostalgia. Th
 
 And who knows... I might do something else with the site one day. I've always liked the theme. We shall see!
 
-- Darc
+Darc
 
 ## Website Development Languages
 Originally, DarcFX.com was developed in PHP. As a side-project, on a boring Saturday, I upgraded the core components of this site in 2010 to ASP.NET 4.0 using Visual C#, my now favorite (and considered native) language. Now? It's just HTML/CSS.
@@ -82,6 +78,6 @@ I still have an IRC Server linked to TheZone IRC Network, which Syber and I co-a
 ### RUNTIMES
 * Runtime Files
 * Tutorials
-* TUTORIALS
 
-Tutorials
+### TUTORIALS
+* Tutorials
