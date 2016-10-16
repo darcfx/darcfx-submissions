@@ -2,6 +2,10 @@
 
 ## History of Darc's Programming Website: DarcFX.com
 DarcFX.com was created in August of 2000. I embarked upon setting up a personal website to post my programs, helpful code snipets, and tutorials on how to make programs, which at the time were mostly AOL mods. Things went slow. To say the least, DarcFX.com was competing with one of the largest tutorial and example sites on the web at that time, KnK 4 Life.
+# DarcFX.com and GitHub darcfx-submissions project
+
+## History of Darc's Programming Website: DarcFX.com
+DarcFX.com was created in August of 2000. I embarked upon setting up a personal website to post my programs, helpful code snipets, and tutorials on how to make programs, which at the time were mostly AOL mods. Things went slow. To say the least, DarcFX.com was competing with one of the largest tutorial and example sites on the web at that time, KnK 4 Life.
 
 At this stage in my life, I was a regular user of TheZone IRC Network	(irc.tzirc.com -> #TheZone). I hadn't really been close with Bill (KnK), but I did know him from #TheZone as he popped in from time to time. Bill eventually got busy with life, and decided to close KnK 4 Life, for life. But instead of rendering his site useless, he decided to sell CDs with all the files on it, hoping that someone would take-over. I bought KnK CD no. 2. Bill had allowed me to post all the KnK files with or without credit to himself. Of course, because I am not lame, he's been right here up-front in the story ever since.
 
@@ -22,60 +26,62 @@ I still have an IRC Server linked to TheZone IRC Network, which Syber and I co-a
 ## DarcFX File Submission Categories
 
 ### AIM
-Controls
-Forms
-Modules
+* Controls
+* Forms
+* Modules
 
 ### AOL 2.5 - 3.0
-Decompiled
-DLLs
-Forms
-Help
-Modules
-VBX
+* Decompiled
+* DLLs
+* Forms
+* Help
+* Modules
+* VBX
 
 ### AOL 4.0 - 5.0
-Controls
-Modules
-Modules - Classes
-Modules - Faders
-Modules - VB3
-Tutorials
-VB4 Forms
-VB5 Forms
-VB6 Forms
+* Controls
+* Modules
+* Modules - Classes
+* Modules - Faders
+* Modules - VB3
+* Tutorials
+* VB4 Forms
+* VB5 Forms
+* VB6 Forms
 
 ### AOL 6.0 - 7.0
-Controls
-DLLs
-Modules
-VB6 Forms
+* Controls
+* DLLs
+* Modules
+* VB6 Forms
 
 ### AOL 8.0 - 9.0
-Controls
-Modules
-COMPUSERV
-Modules
-GAMES
-Forms
+* Controls
+* Modules
+* COMPUSERV
+* Modules
+* GAMES
+* Forms
 
 ### HELP
-Help
+* Help
 
 ### MISC
-Icons
-Other
-Sounds
+* Icons
+* Other
+* Sounds
 
 ### NON-AOL
-Controls
-Modules
-Tools
-VB4 Forms
-VB5 Forms
-VB6 Forms
+* Controls
+* Modules
+* Tools
+* VB4 Forms
+* VB5 Forms
+* VB6 Forms
 
 ### RUNTIMES
-Runtime Files
-TUTORIALS
+* Runtime Files
+* Tutorials
+* TUTORIALS
+
 Tutorials
