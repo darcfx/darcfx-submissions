@@ -56,7 +56,8 @@ I still have an IRC Server linked to TheZone IRC Network (Web @ http://tzirc.com
 ### AOL 8.0 - 9.0
 * Controls
 * Modules
-* COMPUSERV
+
+### COMPUSERV
 * Modules
 * GAMES
 * Forms
